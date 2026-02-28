@@ -51,12 +51,26 @@ recipe:
     user:
       type: string
       default: apr
+    gpu_backend:
+      type: string
+      default: nvidia
+      description: "GPU backend: nvidia, rocm, or cpu"
+    gpu_driver_version:
+      type: string
+      default: "550"
+      description: "Driver version (nvidia driver or amdgpu-dkms)"
+    gpu_toolkit_version:
+      type: string
+      default: "12.4"
+      description: "CUDA version (nvidia) or ROCm version (rocm)"
 
 resources:
   gpu-driver:
     type: gpu
-    driver_version: "550"
-    cuda_version: "12.4"
+    gpu_backend: "{{inputs.gpu_backend}}"
+    driver_version: "{{inputs.gpu_driver_version}}"
+    cuda_version: "{{inputs.gpu_toolkit_version}}"
+    rocm_version: "{{inputs.gpu_toolkit_version}}"
     persistence_mode: true
     compute_mode: default
     depends_on: []
