@@ -138,6 +138,7 @@ resources:
     owner: root
     mode: "0644"
     depends_on: [whisper-pkg, config, gpu-driver]
+    when: '{{inputs.gpu_backend}} != "cpu"'
 
   whisper-service:
     type: service
@@ -146,6 +147,7 @@ resources:
     enabled: true
     restart_on: [systemd-unit, config]
     depends_on: [systemd-unit]
+    when: '{{inputs.gpu_backend}} != "cpu"'
 
   firewall:
     type: network
@@ -153,6 +155,7 @@ resources:
     protocol: tcp
     action: allow
     depends_on: [whisper-service]
+    when: '{{inputs.gpu_backend}} != "cpu"'
 
   health-check:
     type: cron
@@ -161,3 +164,4 @@ resources:
     command: "curl -sf http://localhost:{{inputs.port}}/health || systemctl restart whisper-apr"
     user: root
     depends_on: [whisper-service]
+    when: '{{inputs.gpu_backend}} != "cpu"'

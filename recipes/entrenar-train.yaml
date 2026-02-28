@@ -183,3 +183,4 @@ resources:
     owner: root
     mode: "0644"
     depends_on: [entrenar-pkg, training-config, gpu-driver]
+    when: '{{inputs.gpu_backend}} != "cpu"'
