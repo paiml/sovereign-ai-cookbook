@@ -83,7 +83,7 @@ resources:
   trueno-rag-pkg:
     type: package
     provider: cargo
-    packages: [trueno-rag]
+    packages: [trueno-rag-cli]
     depends_on: []
 
   db-config:
