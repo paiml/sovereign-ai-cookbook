@@ -72,7 +72,7 @@ resources:
   worker-pkg:
     type: package
     provider: cargo
-    packages: [repartir-worker]
+    packages: [repartir]
     depends_on: []
     tags: [packages]
 
