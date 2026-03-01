@@ -3,7 +3,8 @@ name: sovereign-full-stack
 description: |
   Complete sovereign AI lab.
   Composes all PAIML stack components: inference, training, RAG,
-  speech recognition, distributed workers, observability, and registry.
+  speech recognition, autonomous agent, distributed workers,
+  observability, and registry.
 
 params:
   model_path: "/opt/models/llama-2-7b.gguf"
@@ -158,7 +159,22 @@ resources:
       gpu_device: 0
       user: realizar
 
-  # Layer 7: Training pipeline
+  # Layer 7: Autonomous agent
+  agent:
+    type: recipe
+    machine: gpu-box
+    recipe: batuta-agent
+    inputs:
+      port: 8100
+      manifest_name: sovereign-agent
+      model_path: "{{params.model_path}}"
+      max_iterations: 20
+      max_tool_calls: 50
+      capabilities: '"Rag", "Memory"'
+      privacy: Sovereign
+      user: batuta
+
+  # Layer 8: Training pipeline
   training:
     type: recipe
     machine: gpu-box
@@ -173,7 +189,7 @@ resources:
       gpu_device: 0
       user: entrenar
 
-  # Layer 8: Coordination
+  # Layer 9: Coordination
   fleet-inventory:
     type: file
     machine: monitor-box
@@ -202,6 +218,9 @@ resources:
           host: monitor-box
           grafana: 3000
           jaeger: 16686
+        agent:
+          host: gpu-box
+          port: 8100
         registry:
           host: monitor-box
           port: 8070
@@ -226,6 +245,8 @@ resources:
       curl -sf http://rag-box:5433/health && echo " OK" || echo " FAIL"
       echo "--- ASR (rag-box:8095) ---"
       curl -sf http://rag-box:8095/health && echo " OK" || echo " FAIL"
+      echo "--- Agent (gpu-box:8100) ---"
+      curl -sf http://gpu-box:8100/health && echo " OK" || echo " FAIL"
       echo "--- Worker (worker-box:9000) ---"
       curl -sf http://worker-box:9000/status && echo " OK" || echo " FAIL"
       echo "--- Registry (localhost:8070) ---"
