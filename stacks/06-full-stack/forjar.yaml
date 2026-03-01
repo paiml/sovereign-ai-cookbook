@@ -86,11 +86,12 @@ resources:
       retention_days: 7
       user: renacer
 
-  # Layer 2: Model/data registry
+  # Layer 2: Model/data registry (after observability to serialize cargo installs on monitor-box)
   registry:
     type: recipe
     machine: monitor-box
     recipe: pacha-registry
+    depends_on: [observability]
     inputs:
       port: 8070
       storage_dir: /opt/pacha/storage
@@ -125,6 +126,7 @@ resources:
     type: recipe
     machine: rag-box
     recipe: trueno-rag-pipeline
+    depends_on: [vector-db]
     inputs:
       db_port: 5433
       rag_port: 8090
@@ -132,11 +134,12 @@ resources:
       chunk_size: 512
       user: trueno
 
-  # Layer 5: Speech recognition
+  # Layer 5: Speech recognition (after rag-pipeline to serialize cargo installs on rag-box)
   asr:
     type: recipe
     machine: rag-box
     recipe: whisper-apr-asr
+    depends_on: [rag-pipeline]
     inputs:
       model_size: base
       port: 8095
@@ -159,11 +162,12 @@ resources:
       gpu_device: 0
       user: realizar
 
-  # Layer 7: Autonomous agent
+  # Layer 7: Autonomous agent (after inference to serialize cargo installs on gpu-box)
   agent:
     type: recipe
     machine: gpu-box
     recipe: batuta-agent
+    depends_on: [inference]
     inputs:
       port: 8100
       manifest_name: sovereign-agent
@@ -174,11 +178,12 @@ resources:
       privacy: Sovereign
       user: batuta
 
-  # Layer 8: Training pipeline
+  # Layer 8: Training pipeline (after agent to serialize cargo installs on gpu-box)
   training:
     type: recipe
     machine: gpu-box
     recipe: entrenar-train
+    depends_on: [agent]
     inputs:
       dataset_path: "{{params.dataset_path}}"
       output_dir: /opt/entrenar/output
