@@ -69,6 +69,8 @@ machines:
       ephemeral: true
       privileged: false
       init: true
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
 
 resources:
   # Layer 1: Observability (deploy first — monitors everything)
