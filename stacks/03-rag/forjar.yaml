@@ -42,7 +42,7 @@ resources:
     type: recipe
     machine: rag-box
     recipe: trueno-rag-pipeline
-    depends_on: [vector-db/health-check]
+    depends_on: [vector-db]
     inputs:
       db_port: 5433
       rag_port: 8090
@@ -55,7 +55,7 @@ resources:
     type: recipe
     machine: rag-box
     recipe: realizar-serve
-    depends_on: [rag-pipeline/health-check]
+    depends_on: [rag-pipeline]
     inputs:
       model_path: "{{params.model_path}}"
       model_format: gguf
