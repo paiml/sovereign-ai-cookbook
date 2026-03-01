@@ -22,7 +22,7 @@ machines:
       image: forjar-test-target
       name: sovereign-rag
       ephemeral: true
-      privileged: false
+      privileged: true
       init: true
 
 resources:

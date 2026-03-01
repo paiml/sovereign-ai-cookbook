@@ -22,7 +22,7 @@ machines:
       image: forjar-test-target
       name: sovereign-full-gpu
       ephemeral: true
-      privileged: false
+      privileged: true
       init: true
 
   rag-box:
@@ -37,7 +37,7 @@ machines:
       image: forjar-test-target
       name: sovereign-full-rag
       ephemeral: true
-      privileged: false
+      privileged: true
       init: true
 
   worker-box:
@@ -52,7 +52,7 @@ machines:
       image: forjar-test-target
       name: sovereign-full-worker
       ephemeral: true
-      privileged: false
+      privileged: true
       init: true
 
   monitor-box:
@@ -67,7 +67,7 @@ machines:
       image: forjar-test-target
       name: sovereign-full-monitor
       ephemeral: true
-      privileged: false
+      privileged: true
       init: true
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock

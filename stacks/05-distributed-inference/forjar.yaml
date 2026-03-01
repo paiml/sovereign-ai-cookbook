@@ -20,7 +20,7 @@ machines:
       image: forjar-test-target
       name: sovereign-dist-gpu
       ephemeral: true
-      privileged: false
+      privileged: true
       init: true
 
   worker-node:
@@ -35,7 +35,7 @@ machines:
       image: forjar-test-target
       name: sovereign-dist-worker
       ephemeral: true
-      privileged: false
+      privileged: true
       init: true
 
 resources:
