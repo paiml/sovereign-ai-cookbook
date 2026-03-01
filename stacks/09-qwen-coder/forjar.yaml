@@ -95,6 +95,7 @@ resources:
     machine: coder-box
     provider: cargo
     packages: [apr-cli]
+    source: /build/aprender/crates/apr-cli
     depends_on: []
     tags: [packages]
 
