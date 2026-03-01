@@ -78,6 +78,7 @@ resources:
     persistence_mode: true
     compute_mode: default
     depends_on: []
+    tags: [setup, gpu]
 
   service-user:
     type: user
@@ -86,6 +87,7 @@ resources:
     home: /opt/entrenar
     system_user: true
     depends_on: []
+    tags: [setup, users]
 
   base-dir:
     type: file
@@ -94,6 +96,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [service-user]
+    tags: [setup, dirs]
 
   output-dir:
     type: file
@@ -102,6 +105,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [base-dir]
+    tags: [setup, dirs]
 
   checkpoints-dir:
     type: file
@@ -110,6 +114,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [base-dir]
+    tags: [setup, dirs]
 
   logs-dir:
     type: file
@@ -118,12 +123,14 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [base-dir]
+    tags: [setup, dirs]
 
   entrenar-pkg:
     type: package
     provider: cargo
     packages: [entrenar]
     depends_on: []
+    tags: [packages]
 
   training-config:
     type: file
@@ -159,6 +166,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0640"
     depends_on: [output-dir, checkpoints-dir, logs-dir]
+    tags: [config]
 
   systemd-unit:
     type: file
@@ -184,3 +192,4 @@ resources:
     mode: "0644"
     depends_on: [entrenar-pkg, training-config, gpu-driver]
     when: '{{inputs.gpu_backend}} != "cpu"'
+    tags: [config, systemd]

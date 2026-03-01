@@ -49,6 +49,7 @@ resources:
     home: /opt/trueno
     system_user: true
     depends_on: []
+    tags: [setup, users]
 
   base-dir:
     type: file
@@ -57,6 +58,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [service-user]
+    tags: [setup, dirs]
 
   db-data-dir:
     type: file
@@ -65,6 +67,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0700"
     depends_on: [base-dir]
+    tags: [setup, dirs]
 
   rag-data-dir:
     type: file
@@ -73,18 +76,21 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [base-dir]
+    tags: [setup, dirs]
 
   trueno-db-pkg:
     type: package
     provider: cargo
     packages: [trueno-db]
     depends_on: []
+    tags: [packages]
 
   trueno-rag-pkg:
     type: package
     provider: cargo
     packages: [trueno-rag-cli]
     depends_on: []
+    tags: [packages]
 
   db-config:
     type: file
@@ -100,6 +106,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0640"
     depends_on: [db-data-dir]
+    tags: [config]
 
   rag-config:
     type: file
@@ -118,6 +125,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0640"
     depends_on: [rag-data-dir]
+    tags: [config]
 
   db-systemd-unit:
     type: file
@@ -140,6 +148,7 @@ resources:
     owner: root
     mode: "0644"
     depends_on: [trueno-db-pkg, db-config]
+    tags: [config, systemd]
 
   rag-systemd-unit:
     type: file
@@ -163,6 +172,7 @@ resources:
     owner: root
     mode: "0644"
     depends_on: [trueno-rag-pkg, rag-config, db-systemd-unit]
+    tags: [config, systemd]
 
   db-service:
     type: service
@@ -171,6 +181,7 @@ resources:
     enabled: true
     restart_on: [db-systemd-unit, db-config]
     depends_on: [db-systemd-unit]
+    tags: [services]
 
   rag-service:
     type: service
@@ -179,6 +190,7 @@ resources:
     enabled: true
     restart_on: [rag-systemd-unit, rag-config]
     depends_on: [rag-systemd-unit, db-service]
+    tags: [services]
 
   firewall-db:
     type: network
@@ -186,6 +198,7 @@ resources:
     protocol: tcp
     action: allow
     depends_on: [db-service]
+    tags: [network, firewall]
 
   firewall-rag:
     type: network
@@ -193,6 +206,7 @@ resources:
     protocol: tcp
     action: allow
     depends_on: [rag-service]
+    tags: [network, firewall]
 
   health-check:
     type: cron
@@ -201,3 +215,4 @@ resources:
     command: "curl -sf http://localhost:{{inputs.rag_port}}/health || systemctl restart trueno-rag"
     user: root
     depends_on: [rag-service]
+    tags: [monitoring]

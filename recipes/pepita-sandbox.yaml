@@ -43,6 +43,7 @@ resources:
     home: /opt/pepita
     system_user: true
     depends_on: []
+    tags: [setup, users]
 
   base-dir:
     type: file
@@ -51,12 +52,14 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [service-user]
+    tags: [setup, dirs]
 
   pepita-pkg:
     type: package
     provider: cargo
     packages: [pepita]
     depends_on: []
+    tags: [packages]
 
   sandbox:
     type: pepita
@@ -72,6 +75,7 @@ resources:
     overlay_merged: /opt/pepita/merged
     seccomp: true
     depends_on: [pepita-pkg, base-dir]
+    tags: [setup, isolation]
 
   upper-dir:
     type: file
@@ -80,6 +84,7 @@ resources:
     owner: root
     mode: "0755"
     depends_on: [base-dir]
+    tags: [setup, dirs]
 
   work-dir:
     type: file
@@ -88,6 +93,7 @@ resources:
     owner: root
     mode: "0755"
     depends_on: [base-dir]
+    tags: [setup, dirs]
 
   merged-dir:
     type: file
@@ -96,3 +102,4 @@ resources:
     owner: root
     mode: "0755"
     depends_on: [base-dir]
+    tags: [setup, dirs]

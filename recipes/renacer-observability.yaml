@@ -50,6 +50,7 @@ resources:
     home: /opt/renacer
     system_user: true
     depends_on: []
+    tags: [setup, users]
 
   obs-data-dir:
     type: file
@@ -58,6 +59,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [obs-user]
+    tags: [setup, dirs]
 
   obs-grafana-data:
     type: file
@@ -67,12 +69,14 @@ resources:
     group: "472"
     mode: "0755"
     depends_on: [obs-data-dir]
+    tags: [setup, dirs]
 
   renacer-pkg:
     type: package
     provider: cargo
     packages: [renacer]
     depends_on: []
+    tags: [packages]
 
   jaeger:
     type: docker
@@ -93,6 +97,7 @@ resources:
       - "/opt/renacer/jaeger:/badger"
     restart: unless-stopped
     depends_on: [obs-data-dir]
+    tags: [services, docker]
 
   grafana-provisioning:
     type: file
@@ -109,6 +114,7 @@ resources:
     owner: "472"
     mode: "0644"
     depends_on: [obs-grafana-data]
+    tags: [config]
 
   grafana:
     type: docker
@@ -125,6 +131,7 @@ resources:
       - "/opt/renacer/grafana/provisioning:/etc/grafana/provisioning"
     restart: unless-stopped
     depends_on: [grafana-provisioning, jaeger]
+    tags: [services, docker]
 
   firewall-grafana:
     type: network
@@ -132,6 +139,7 @@ resources:
     protocol: tcp
     action: allow
     depends_on: [grafana]
+    tags: [network, firewall]
 
   firewall-jaeger:
     type: network
@@ -139,6 +147,7 @@ resources:
     protocol: tcp
     action: allow
     depends_on: [jaeger]
+    tags: [network, firewall]
 
   firewall-otlp:
     type: network
@@ -146,3 +155,4 @@ resources:
     protocol: tcp
     action: allow
     depends_on: [jaeger]
+    tags: [network, firewall]

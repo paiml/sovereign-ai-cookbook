@@ -74,6 +74,7 @@ resources:
     persistence_mode: true
     compute_mode: default
     depends_on: []
+    tags: [setup, gpu]
 
   model-download:
     type: model
@@ -86,6 +87,7 @@ resources:
     owner: "{{inputs.user}}"
     depends_on: [gpu-driver]
     when: '{{inputs.gpu_backend}} != "cpu"'
+    tags: [setup, models]
 
   service-user:
     type: user
@@ -94,6 +96,7 @@ resources:
     home: /opt/realizar
     system_user: true
     depends_on: []
+    tags: [setup, users]
 
   data-dir:
     type: file
@@ -102,6 +105,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [service-user]
+    tags: [setup, dirs]
 
   models-dir:
     type: file
@@ -110,6 +114,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [data-dir]
+    tags: [setup, dirs]
 
   cache-dir:
     type: file
@@ -118,12 +123,14 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [data-dir]
+    tags: [setup, dirs]
 
   realizar-pkg:
     type: package
     provider: cargo
     packages: [realizar]
     depends_on: []
+    tags: [packages]
 
   systemd-unit:
     type: file
@@ -154,6 +161,7 @@ resources:
     mode: "0644"
     depends_on: [realizar-pkg, model-download, data-dir]
     when: '{{inputs.gpu_backend}} != "cpu"'
+    tags: [config, systemd]
 
   realizar-service:
     type: service
@@ -163,6 +171,7 @@ resources:
     restart_on: [systemd-unit, model-download]
     depends_on: [systemd-unit]
     when: '{{inputs.gpu_backend}} != "cpu"'
+    tags: [services]
 
   firewall:
     type: network
@@ -171,6 +180,7 @@ resources:
     action: allow
     depends_on: [realizar-service]
     when: '{{inputs.gpu_backend}} != "cpu"'
+    tags: [network, firewall]
 
   health-check:
     type: cron
@@ -180,3 +190,4 @@ resources:
     user: root
     depends_on: [realizar-service]
     when: '{{inputs.gpu_backend}} != "cpu"'
+    tags: [monitoring]

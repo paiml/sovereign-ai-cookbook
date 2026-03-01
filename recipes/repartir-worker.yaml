@@ -49,6 +49,7 @@ resources:
     home: /opt/repartir
     system_user: true
     depends_on: []
+    tags: [setup, users]
 
   worker-dirs:
     type: file
@@ -57,6 +58,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [worker-user]
+    tags: [setup, dirs]
 
   worker-tls-dir:
     type: file
@@ -65,12 +67,14 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0700"
     depends_on: [worker-dirs]
+    tags: [setup, dirs]
 
   worker-pkg:
     type: package
     provider: cargo
     packages: [repartir-worker]
     depends_on: []
+    tags: [packages]
 
   worker-config:
     type: file
@@ -86,6 +90,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0640"
     depends_on: [worker-tls-dir]
+    tags: [config]
 
   worker-tls-cert:
     type: file
@@ -94,6 +99,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0644"
     depends_on: [worker-tls-dir]
+    tags: [config]
 
   worker-tls-key:
     type: file
@@ -102,6 +108,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0600"
     depends_on: [worker-tls-dir]
+    tags: [config]
 
   worker-systemd-unit:
     type: file
@@ -124,6 +131,7 @@ resources:
     owner: root
     mode: "0644"
     depends_on: [worker-pkg, worker-config, worker-tls-cert, worker-tls-key]
+    tags: [config, systemd]
 
   worker-service:
     type: service
@@ -132,6 +140,7 @@ resources:
     enabled: true
     restart_on: [worker-systemd-unit, worker-config, worker-tls-cert, worker-tls-key]
     depends_on: [worker-systemd-unit]
+    tags: [services]
 
   worker-firewall:
     type: network
@@ -139,3 +148,4 @@ resources:
     protocol: tcp
     action: allow
     depends_on: [worker-service]
+    tags: [network, firewall]

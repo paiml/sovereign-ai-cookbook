@@ -64,6 +64,7 @@ resources:
     home: /opt/forjar-stack
     system_user: true
     depends_on: []
+    tags: [setup, users]
 
   coord-dir:
     type: file
@@ -72,6 +73,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [coord-user]
+    tags: [setup, dirs]
 
   fleet-inventory:
     type: file
@@ -88,6 +90,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0644"
     depends_on: [coord-dir]
+    tags: [config]
 
   health-dashboard:
     type: file
@@ -113,6 +116,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [coord-dir]
+    tags: [config, scripts]
 
   health-cron:
     type: cron
@@ -121,3 +125,4 @@ resources:
     command: "/opt/forjar-stack/health-check.sh >> /opt/forjar-stack/health.log 2>&1"
     user: "{{inputs.user}}"
     depends_on: [health-dashboard, fleet-inventory]
+    tags: [monitoring]

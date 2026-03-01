@@ -67,6 +67,7 @@ resources:
     persistence_mode: true
     compute_mode: default
     depends_on: []
+    tags: [setup, gpu]
 
   service-user:
     type: user
@@ -75,6 +76,7 @@ resources:
     home: /opt/whisper-apr
     system_user: true
     depends_on: []
+    tags: [setup, users]
 
   base-dir:
     type: file
@@ -83,6 +85,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [service-user]
+    tags: [setup, dirs]
 
   models-dir:
     type: file
@@ -91,12 +94,14 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [base-dir]
+    tags: [setup, dirs]
 
   whisper-pkg:
     type: package
     provider: cargo
     packages: [whisper-apr]
     depends_on: []
+    tags: [packages]
 
   config:
     type: file
@@ -114,6 +119,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0640"
     depends_on: [models-dir]
+    tags: [config]
 
   systemd-unit:
     type: file
@@ -139,6 +145,7 @@ resources:
     mode: "0644"
     depends_on: [whisper-pkg, config, gpu-driver]
     when: '{{inputs.gpu_backend}} != "cpu"'
+    tags: [config, systemd]
 
   whisper-service:
     type: service
@@ -148,6 +155,7 @@ resources:
     restart_on: [systemd-unit, config]
     depends_on: [systemd-unit]
     when: '{{inputs.gpu_backend}} != "cpu"'
+    tags: [services]
 
   firewall:
     type: network
@@ -156,6 +164,7 @@ resources:
     action: allow
     depends_on: [whisper-service]
     when: '{{inputs.gpu_backend}} != "cpu"'
+    tags: [network, firewall]
 
   health-check:
     type: cron
@@ -165,3 +174,4 @@ resources:
     user: root
     depends_on: [whisper-service]
     when: '{{inputs.gpu_backend}} != "cpu"'
+    tags: [monitoring]

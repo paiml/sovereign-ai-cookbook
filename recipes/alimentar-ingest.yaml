@@ -45,6 +45,7 @@ resources:
     home: /opt/alimentar
     system_user: true
     depends_on: []
+    tags: [setup, users]
 
   base-dir:
     type: file
@@ -53,6 +54,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [service-user]
+    tags: [setup, dirs]
 
   output-dir:
     type: file
@@ -61,6 +63,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [base-dir]
+    tags: [setup, dirs]
 
   staging-dir:
     type: file
@@ -69,6 +72,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [base-dir]
+    tags: [setup, dirs]
 
   logs-dir:
     type: file
@@ -77,12 +81,14 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0755"
     depends_on: [base-dir]
+    tags: [setup, dirs]
 
   alimentar-pkg:
     type: package
     provider: cargo
     packages: [alimentar]
     depends_on: []
+    tags: [packages]
 
   config:
     type: file
@@ -107,6 +113,7 @@ resources:
     owner: "{{inputs.user}}"
     mode: "0640"
     depends_on: [output-dir, staging-dir, logs-dir]
+    tags: [config]
 
   systemd-unit:
     type: file
@@ -128,6 +135,7 @@ resources:
     owner: root
     mode: "0644"
     depends_on: [alimentar-pkg, config]
+    tags: [config, systemd]
 
   ingest-cron:
     type: cron
@@ -136,3 +144,4 @@ resources:
     command: "/usr/local/bin/alimentar ingest --config /opt/alimentar/config.yaml >> /opt/alimentar/logs/cron.log 2>&1"
     user: "{{inputs.user}}"
     depends_on: [systemd-unit]
+    tags: [monitoring]

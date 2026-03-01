@@ -84,6 +84,7 @@ resources:
     owner: realizar
     mode: "0644"
     depends_on: []
+    tags: [config]
 
 policy:
   failure: stop_on_first
