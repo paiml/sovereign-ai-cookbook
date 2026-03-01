@@ -23,7 +23,7 @@ machines:
       image: forjar-test-target
       name: sovereign-observability
       ephemeral: true
-      privileged: false
+      privileged: true
       init: true
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
