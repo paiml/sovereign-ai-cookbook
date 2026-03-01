@@ -42,6 +42,15 @@ Each stack is a complete, deployable `forjar.yaml` targeting docker containers. 
 | **[06-full-stack](stacks/06-full-stack/)** | **Complete sovereign AI lab** | **all components** | **86** |
 | [07-data-pipeline](stacks/07-data-pipeline/) | Ingest, train, serve | alimentar, entrenar, realizar | 29 |
 | [08-observability](stacks/08-observability/) | Monitoring and tracing | renacer, Jaeger, Grafana | 10 |
+| [09-qwen-coder](stacks/09-qwen-coder/) | Local coding assistant | aprender (apr-cli) | 16 |
+
+### Clean-Room Test Matrix
+
+<!-- STACK_MATRIX_START -->
+
+*No results yet — run `make -f machines/clean-room/Makefile clean-room-sovereign-ai-cookbook` from the [infra](https://github.com/paiml/infra) repo.*
+
+<!-- STACK_MATRIX_END -->
 
 ## Recipes
 
