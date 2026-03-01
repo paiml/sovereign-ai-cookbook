@@ -91,7 +91,7 @@ resources:
     type: recipe
     machine: monitor-box
     recipe: pacha-registry
-    depends_on: [observability]
+    depends_on: [observability/firewall-otlp]
     inputs:
       port: 8070
       storage_dir: /opt/pacha/storage
@@ -126,7 +126,7 @@ resources:
     type: recipe
     machine: rag-box
     recipe: trueno-rag-pipeline
-    depends_on: [vector-db]
+    depends_on: [vector-db/health-check]
     inputs:
       db_port: 5433
       rag_port: 8090
@@ -139,7 +139,7 @@ resources:
     type: recipe
     machine: rag-box
     recipe: whisper-apr-asr
-    depends_on: [rag-pipeline]
+    depends_on: [rag-pipeline/health-check]
     inputs:
       model_size: base
       port: 8095
@@ -167,7 +167,7 @@ resources:
     type: recipe
     machine: gpu-box
     recipe: batuta-agent
-    depends_on: [inference]
+    depends_on: [inference/health-check]
     inputs:
       port: 8100
       manifest_name: sovereign-agent
@@ -183,7 +183,7 @@ resources:
     type: recipe
     machine: gpu-box
     recipe: entrenar-train
-    depends_on: [agent]
+    depends_on: [agent/health-check]
     inputs:
       dataset_path: "{{params.dataset_path}}"
       output_dir: /opt/entrenar/output

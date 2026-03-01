@@ -37,12 +37,12 @@ resources:
       max_memory_mb: 2048
       user: trueno
 
-  # Layer 2: RAG pipeline (depends on vector-db to serialize cargo installs)
+  # Layer 2: RAG pipeline (after vector-db to serialize cargo installs on rag-box)
   rag-pipeline:
     type: recipe
     machine: rag-box
     recipe: trueno-rag-pipeline
-    depends_on: [vector-db]
+    depends_on: [vector-db/health-check]
     inputs:
       db_port: 5433
       rag_port: 8090
@@ -50,12 +50,12 @@ resources:
       chunk_size: 512
       user: trueno
 
-  # Layer 3: Generation model (depends on rag-pipeline to serialize cargo installs)
+  # Layer 3: Generation model (after rag-pipeline to serialize cargo installs on rag-box)
   generation:
     type: recipe
     machine: rag-box
     recipe: realizar-serve
-    depends_on: [rag-pipeline]
+    depends_on: [rag-pipeline/health-check]
     inputs:
       model_path: "{{params.model_path}}"
       model_format: gguf
