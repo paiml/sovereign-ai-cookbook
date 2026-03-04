@@ -12,7 +12,8 @@ cd ~/src/aprender
 CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc \
 CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc \
 cargo +nightly build --release --target aarch64-unknown-linux-gnu \
-    -p apr-cli --target-dir /tmp/cross-jetson
+    -p apr-cli --target-dir /tmp/cross-jetson \
+    --no-default-features --features "hf-hub,safetensors-compare,inference,zram"
 
 # Phase 2: Deploy binary + model to Jetson
 echo "--- Deploying to Jetson ---"
