@@ -1,0 +1,21 @@
+name: Jetson Canary
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # 6am UTC (2am ET) daily
+  workflow_dispatch: {}   # manual trigger via GitHub UI
+
+jobs:
+  canary:
+    runs-on: self-hosted  # intel (192.168.50.100)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Canary pipeline
+        run: bash scripts/canary-jetson.sh
+
+      - name: Commit results
+        run: |
+          git add machines/jetson/canary/
+          git commit -m "canary: $(date +%Y-%m-%d) jetson nightly results" || echo "No changes"
+          git push
