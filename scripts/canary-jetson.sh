@@ -65,6 +65,18 @@ probador llm load \
     --runtime-name qwen-coder-jetson-aarch64 \
     --output $CANARY/probar-load.json || true
 
+echo "--- probador benchmark (regression gate) ---"
+if [ -f "$CANARY/baselines/latest.json" ]; then
+    probador llm bench \
+        --url http://192.168.50.53:8080 \
+        --runs 3 --duration 30s --warmup 5s \
+        --concurrency 2 \
+        --baseline $CANARY/baselines/latest.json \
+        --fail-on-regression 50.0 \
+        --runtime-name qwen-coder-jetson-aarch64 \
+        --output $CANARY/probar-bench.json || true
+fi
+
 echo "--- Stopping Jetson server ---"
 ssh jetson 'pkill -f qwen-coder-jetson || true'
 
