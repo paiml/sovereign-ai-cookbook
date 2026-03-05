@@ -1,0 +1,16 @@
+# PMAT quality thresholds for sovereign-ai-cookbook
+# This is a forjar/YAML config project — not a Rust crate.
+
+[thresholds]
+# No code coverage — this is infrastructure-as-code
+min_coverage = 0.0
+# Advisory: markdown line length
+max_line_length = 120
+
+[checks]
+# YAML best practices enforced
+yaml_lint = true
+# Shell script quality via bashrs
+shell_lint = true
+# Markdown advisory only
+markdown_lint = "advisory"
