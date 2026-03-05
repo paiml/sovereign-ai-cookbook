@@ -24,10 +24,5 @@ jobs:
         run: |
           git add machines/jetson/canary/
           git diff --cached --quiet && echo "No changes" && exit 0
-          git commit -m "$(cat <<'EOF'
-          canary: $(date +%Y-%m-%d) jetson nightly results
-
-          Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
-          EOF
-          )"
+          git commit -m "canary: $(date +%Y-%m-%d) jetson nightly results"
           git push
