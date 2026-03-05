@@ -78,6 +78,7 @@ resources:
     persistence_mode: true
     compute_mode: default
     depends_on: []
+    when: '{{inputs.gpu_backend}} != "cpu"'
     tags: [setup, gpu]
 
   service-user:
