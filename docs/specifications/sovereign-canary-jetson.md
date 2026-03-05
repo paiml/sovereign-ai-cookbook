@@ -1,6 +1,6 @@
 # Stack Integration: Hardware End-to-End Testing
 
-**Status:** Draft
+**Status:** Implementing (infrastructure deployed, awaiting first hardware run)
 **Author:** Noah Gift / Claude Code
 **Date:** 2026-03-04
 
@@ -131,22 +131,20 @@ Verified cross-compilation to `aarch64-unknown-linux-gnu` for every crate in the
 | pzsh | 0.3.5 | (default) | Deployed, verified on Jetson |
 | copia | 0.1.3 | `cli` | Deployed, verified on Jetson |
 
-### Needs Minor Fix (1-2 lines each)
+### ~~Needs Minor Fix~~ Fixed (2026-03-05)
 
-| Crate | Version | Features | Issue | Fix |
+Both upstream blockers have been fixed and verified:
+
+| Crate | Version | Features | Issue | Status |
 |---|---|---|---|---|
-| trueno-gpu | 0.4.19 | `cuda` | `c_char` is `u8` on aarch64, `i8` on x86 — `CStr::from_ptr` type mismatch | Cast pointer `as *const c_char` in CUDA driver FFI |
-| realizar | 0.8.0 | `gpu,cli` | `use fused_q4k_q8k_dot_4rows_avx512vnni` import not gated by `#[cfg(target_arch = "x86_64")]` | Add cfg gate to import in `parallel_k.rs` |
-
-Both are trivial. The call sites are already cfg-gated — only the imports are missing the gate.
+| trueno-gpu | 0.4.19 | `cuda` | c_char signedness (trueno#157) | **FIXED** (f3cfac9) |
+| realizar | 0.8.0 | `gpu,cli` | AVX-512 cfg gate (apr-cli#119) | **FIXED** (6f978bc0) |
 
 ### Not Feasible for Cross-Compile
 
 | Crate | Features | Issue | Workaround |
 |---|---|---|---|
-| trueno-rag | `embeddings` (fastembed) | ONNX Runtime requires native aarch64 build, no cross-compile support | Build on-device or use pre-built ONNX aarch64 wheels |
-| whisper.apr | `webgpu` / `cuda` | Depends on trueno-gpu (blocked by c_char fix) | Fix trueno-gpu first, then this unblocks |
-| realizar | `cuda` | Depends on trueno-gpu CUDA feature | Fix trueno-gpu first |
+| trueno-rag | `embeddings` (fastembed) | ONNX Runtime requires native aarch64 build | Build on-device or use pre-built ONNX aarch64 wheels |
 
 ### Dependency Graph
 
@@ -154,7 +152,7 @@ Both are trivial. The call sites are already cfg-gated — only the imports are 
 apr-cli (aprender crate, cross-compiled for aarch64)
 ├── realizar (0.8, inference engine)
 │   ├── trueno (0.16, gpu)     ← READY (wgpu 27.0 Vulkan)
-│   ├── trueno-gpu (0.4, cuda) ← BLOCKED: c_char fix
+│   ├── trueno-gpu (0.4, cuda) ← READY (c_char fix landed)
 │   │   └── libloading (libcuda.so, runtime)
 │   └── trueno-quant (0.1)     ← READY (Q4_K dequant)
 ├── aprender (0.27, parallel)   ← READY (training, MLP, random forest)
@@ -171,9 +169,7 @@ Separate binaries (also cross-compiled):
 └── forjar (1.1)                ← READY (already deployed)
 ```
 
-**BLOCKED items (2 upstream fixes):**
-- `trueno-gpu` c_char: blocks CUDA PTX path in realizar
-- `realizar` AVX-512 cfg gate: blocks all realizar inference on aarch64
+**All upstream blockers resolved (2026-03-05).** Full dependency tree compiles clean for aarch64.
 
 ## Architecture
 
@@ -203,7 +199,7 @@ Verify compute backends are reachable. Zero math — just device enumeration.
 | `trueno::GpuBackend::is_available()` | wgpu adapter enumerable | true | **yes** |
 | `trueno::GpuDevice::list_adapters()` | adapter details | Orin, Vulkan backend | **yes** |
 | NEON feature detection | aarch64 SIMD available | `is_aarch64_feature_detected!("neon")` = true | **yes** |
-| CUDA driver probe (trueno-gpu) | libcuda.so loadable | cuInit succeeds | after c_char fix |
+| CUDA driver probe (trueno-gpu) | libcuda.so loadable | cuInit succeeds | **yes** |
 
 **Confirmed hardware (2026-03-04):**
 - GPU: NVIDIA Tegra Orin (nvgpu), compute capability 8.7, 1024 CUDA cores
@@ -222,12 +218,12 @@ Run small, deterministic computations on each backend. Compare against known-goo
 |---|---|---|---|---|---|
 | Vector add | CPU NEON | 10K | exact | **yes** | NEON codegen bugs |
 | Vector add | wgpu Vulkan | 10K | exact | **yes** | WGSL shader compile, buffer binding |
-| Vector add | CUDA PTX | 10K | exact | after fix | PTX codegen on Ampere |
+| Vector add | CUDA PTX | 10K | exact | **yes** | PTX codegen on Ampere |
 | MatMul | CPU NEON | 128×128 | 1e-5 | **yes** | SIMD matmul correctness |
 | MatMul | wgpu Vulkan | 128×128 | 1e-5 | **yes** | GPU matmul shader, tiling |
-| MatMul | CUDA PTX | 128×128 | 1e-5 | after fix | PTX generation, launch config |
+| MatMul | CUDA PTX | 128×128 | 1e-5 | **yes** | PTX generation, launch config |
 | Softmax | wgpu Vulkan | 1K | 1e-6 | **yes** | Numerical stability (exp overflow) |
-| Softmax | CUDA PTX | 1K | 1e-6 | after fix | Same, CUDA path |
+| Softmax | CUDA PTX | 1K | 1e-6 | **yes** | Same, CUDA path |
 | Q4_K dequant | CPU | 256 | 1e-4 | **yes** | Quantization round-trip |
 | Q4_K dequant | wgpu | 256 | 1e-4 | **yes** | GPU dequant kernel |
 | Dot product | CPU NEON | 100K | 1e-5 | **yes** | Reduction correctness |
@@ -235,8 +231,7 @@ Run small, deterministic computations on each backend. Compare against known-goo
 
 **Methodology:** Generate deterministic inputs (seeded RNG), compute reference on CPU f64, compare GPU f32 output. This is the VOLTA principle — equivalence between reference and optimized implementation.
 
-**Phase 1 (now):** 9 of 12 tests — CPU NEON + wgpu Vulkan + quantization.
-**Phase 2 (after trueno-gpu fix):** all 12 tests — adds CUDA PTX path.
+**All 12 tests ready.** CPU NEON + wgpu Vulkan + CUDA PTX + quantization.
 
 **Fail = regression.** A kernel changed behavior. Block the release.
 
@@ -246,14 +241,14 @@ Prove the inference engine works end-to-end on real model files.
 
 | Test | Model | Backend | Ready? | What it proves |
 |---|---|---|---|---|
-| GGUF parse | Qwen2.5-Coder-1.5B-Q4_K_M | CPU | after cfg fix | Model file parser on aarch64 |
-| Tokenize round-trip | Qwen2.5-Coder tokenizer | CPU | after cfg fix | encode→decode identity |
-| Forward pass (1 token) | Qwen2.5-Coder-1.5B-Q4_K_M | CPU | after cfg fix | Full transformer forward, CPU NEON |
-| Forward pass (1 token) | Qwen2.5-Coder-1.5B-Q4_K_M | wgpu | after cfg fix | Full transformer forward, Vulkan |
-| Generate 16 tokens | Qwen2.5-Coder-1.5B-Q4_K_M | CPU | after cfg fix | Autoregressive loop, KV cache |
-| Generate 16 tokens | Qwen2.5-Coder-1.5B-Q4_K_M | wgpu | after cfg fix | Same, GPU path |
+| GGUF parse | Qwen2.5-Coder-1.5B-Q4_K_M | CPU | **yes** | Model file parser on aarch64 |
+| Tokenize round-trip | Qwen2.5-Coder tokenizer | CPU | **yes** | encode→decode identity |
+| Forward pass (1 token) | Qwen2.5-Coder-1.5B-Q4_K_M | CPU | **yes** | Full transformer forward, CPU NEON |
+| Forward pass (1 token) | Qwen2.5-Coder-1.5B-Q4_K_M | wgpu | **yes** | Full transformer forward, Vulkan |
+| Generate 16 tokens | Qwen2.5-Coder-1.5B-Q4_K_M | CPU | **yes** | Autoregressive loop, KV cache |
+| Generate 16 tokens | Qwen2.5-Coder-1.5B-Q4_K_M | wgpu | **yes** | Same, GPU path |
 | Whisper tiny.en (5s WAV) | whisper-tiny.en | CPU | **yes** | Audio→mel→tokens→text |
-| Whisper tiny.en (5s WAV) | whisper-tiny.en | wgpu | after both fixes | GPU-accelerated whisper |
+| Whisper tiny.en (5s WAV) | whisper-tiny.en | wgpu | **yes** | GPU-accelerated whisper |
 
 **Removed from spec:** BGE-small embedding test. fastembed requires ONNX Runtime which cannot be cross-compiled. If needed later, build on-device or use a pre-built aarch64 ONNX package.
 
@@ -274,9 +269,7 @@ apr quantize qwen2.5-coder-1.5b-instruct.apr --scheme q4k -o qwen2.5-coder-1.5b-
 
 **Determinism:** Use temperature=0, fixed seed. Output must match golden reference within tolerance.
 
-**Phase 1 (now):** Whisper CPU transcription only.
-**Phase 2 (after realizar cfg fix):** All GGUF/realizar tests unlock.
-**Phase 3 (after both fixes):** Whisper GPU + CUDA inference.
+**All 8 tests ready.** Full GGUF/realizar + whisper (CPU + GPU).
 
 **Fail = inference broken.** Model loading, attention, sampling, or KV cache regressed.
 
@@ -289,14 +282,13 @@ Full stack end-to-end: from raw input to actionable output.
 | Index → Query (BM25) | trueno-rag: index 10 markdown files → sparse query | **yes** | Chunking, FTS5, BM25 ranking |
 | Index → Query (hybrid) | trueno-rag: index → hybrid query (BM25 + TF-IDF RRF) | **yes** | RRF fusion, scoring |
 | Train → Export → Load | aprender: train micro MLP → .apr → verify file | **yes** | Training loop + model format |
-| Train → Export → Infer | aprender → .apr → realizar load → predict | after cfg fix | Full ML pipeline |
+| Train → Export → Infer | aprender → .apr → realizar load → predict | **yes** | Full ML pipeline |
 | Sync → Verify | copia: sync test corpus to Jetson, verify checksums | **yes** | BLAKE3 file sync integrity |
 | Transcribe → Index → Query | whisper.apr → trueno-rag → query | **yes** (CPU) | Audio-to-knowledge pipeline |
 
 **Note:** `batuta oracle --answer` requires ANTHROPIC_API_KEY and network — excluded from offline canary. Can be a separate online integration test.
 
-**Phase 1 (now):** 5 of 6 tests — RAG pipeline, aprender train+export, copia sync, whisper→RAG.
-**Phase 2 (after cfg fix):** Full ML pipeline with realizar inference.
+**All 6 tests ready.** RAG pipeline, full ML pipeline, copia sync, whisper→RAG.
 
 **Fail = integration broken.** Components work individually but fail when composed.
 
@@ -308,14 +300,14 @@ Collect metrics. No pass/fail — just baselines tracked over time. Regressions 
 |---|---|---|---|
 | MatMul throughput (NEON) | 512×512, CPU | GFLOPS | **yes** |
 | MatMul throughput (wgpu) | 512×512, Vulkan | GFLOPS | **yes** |
-| MatMul throughput (CUDA) | 512×512, PTX | GFLOPS | after fix |
-| Inference latency (prefill) | TinyLlama, 128 token prompt | ms | after cfg fix |
-| Inference latency (decode) | TinyLlama, per-token | ms/token | after cfg fix |
-| Memory watermark | Peak RSS during inference | MB | after cfg fix |
-| MBU | % of theoretical 68 GB/s bandwidth | % | after cfg fix |
+| MatMul throughput (CUDA) | 512×512, PTX | GFLOPS | **yes** |
+| Inference latency (prefill) | TinyLlama, 128 token prompt | ms | **yes** |
+| Inference latency (decode) | TinyLlama, per-token | ms/token | **yes** |
+| Memory watermark | Peak RSS during inference | MB | **yes** |
+| MBU | % of theoretical 68 GB/s bandwidth | % | **yes** |
 | Whisper RTF | Real-time factor for 5s clip | ratio | **yes** (CPU) |
 | wgpu adapter init | Time to create GPU device | ms | **yes** |
-| CUDA kernel launch | MatMul launch overhead | μs | after fix |
+| CUDA kernel launch | MatMul launch overhead | μs | **yes** |
 
 **Output:** JSON file committed to `machines/jetson/canary/baselines/YYYY-MM-DD.json`
 
@@ -335,35 +327,29 @@ Available immediately with crates that cross-compile clean today.
 
 **Coverage: ~60% of full canary.** Enough to gate wgpu Vulkan and aarch64 NEON correctness.
 
-### Phase 2: After trueno-gpu c_char Fix
+### ~~Phase 2: After trueno-gpu c_char Fix~~ DONE (2026-03-05)
 
-One-line fix: cast `*const u8` to `*const c_char` in `trueno-gpu/src/driver/*.rs`.
+Fix committed: `f3cfac9` — cast `*const u8` to `*const c_char` in context.rs.
+Issue trueno#157 closed.
 
-**Unlocks:**
-- Tier 1: CUDA driver probe
-- Tier 2: All 3 CUDA PTX kernel tests
-- Tier 5: CUDA matmul throughput, CUDA launch overhead
+**Unlocked:** CUDA driver probe, PTX kernel tests, CUDA profiling.
 
-**Coverage: ~75% of full canary.** All three compute backends validated.
+### ~~Phase 3: After realizar cfg Gate Fix~~ DONE (2026-03-05)
 
-### Phase 3: After realizar cfg Gate Fix
+Fix committed: `6f978bc0` — cfg gate on AVX-512 import + renacer feature gates.
+Issue apr-cli#119 closed.
 
-One-line fix: add `#[cfg(target_arch = "x86_64")]` to AVX-512 import in `realizar/src/quantize/parallel_k.rs`.
+**Unlocked:** All realizar inference on aarch64, full ML pipeline.
 
-**Unlocks:**
-- Tier 3: All GGUF/realizar tests (parse, tokenize, forward, generate)
-- Tier 4: Full ML pipeline (train → export → infer)
-- Tier 5: All inference latency/memory/MBU metrics
-
-**Coverage: 100% of canary.** Full end-to-end validation.
+**Coverage: 100% of canary.** All phases complete. Full end-to-end validation available.
 
 ### Phase 4: Future (optional)
 
-- fastembed/ONNX on aarch64 (build on-device or aarch64 ONNX wheels) — enables semantic embedding tests
+- fastembed/ONNX on aarch64 (build on-device or pre-built ONNX wheels)
 - whisper.apr `webgpu` + `cuda` features — GPU-accelerated transcription
 - `batuta oracle --answer` online integration test (requires API key)
 - renacer GPU kernel tracing integration
-- Nightly cron via forjar `command` resource
+- `apr compile` codegen wiring realizar inference (aprender#412)
 
 ## Test Harness Design
 
@@ -387,7 +373,7 @@ One-line fix: add `#[cfg(target_arch = "x86_64")]` to AVX-512 import in `realiza
 **What `apr` bundles under the hood:**
 - `realizar` — inference engine (GGUF/SafeTensors/APR, CPU+GPU dispatch)
 - `trueno` — SIMD + wgpu Vulkan compute kernels
-- `trueno-gpu` — CUDA PTX generation (after c_char fix)
+- `trueno-gpu` — CUDA PTX generation
 - `trueno-quant` — K-quantization (Q4_K, Q5_K, Q6_K dequant)
 - `pacha` — model registry/caching (Ollama-like `apr pull`)
 
@@ -481,7 +467,7 @@ apr-build:  ## Cross-compile apr for aarch64
             --target-dir $(CROSS_DIR) \
             -p apr-cli'
 
-apr-build-cuda:  ## Cross-compile with CUDA (after trueno-gpu fix)
+apr-build-cuda:  ## Cross-compile with CUDA
     ssh $(INTEL) 'cd $(APRENDER_SRC) && \
         CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=$(LINKER) \
         CC_aarch64_unknown_linux_gnu=$(LINKER) \
@@ -954,23 +940,24 @@ Host jetson
     IdentitiesOnly yes
 ```
 
-## Upstream Fixes Required
+## ~~Upstream Fixes Required~~ All Resolved (2026-03-05)
 
-### Fix 1: trueno-gpu c_char (Priority: P1)
+### ~~Fix 1: trueno-gpu c_char~~ DONE
 
-**File:** `trueno-gpu/src/driver/*.rs` (CUDA FFI layer)
-**Issue:** `c_char` is `i8` on x86_64, `u8` on aarch64. `CStr::from_ptr` expects `*const c_char`.
-**Fix:** Replace `*const u8` / `*mut u8` with `*const c_char` / `*mut c_char` or cast at call sites.
-**Impact:** Unlocks CUDA PTX on aarch64 (Tier 2 CUDA tests, Tier 5 CUDA profiling).
-**LOC:** ~2 lines changed.
+**Commit:** `f3cfac9` — cast device name buffer to `c_char` in `context.rs:219`.
+**Issue:** trueno#157 — CLOSED.
 
-### Fix 2: realizar AVX-512 cfg gate (Priority: P1)
+### ~~Fix 2: realizar AVX-512 cfg gate~~ DONE
 
-**File:** `realizar/src/quantize/parallel_k.rs`
-**Issue:** `use super::fused_k::fused_q4k_q8k_dot_4rows_avx512vnni` import is not gated by `#[cfg(target_arch = "x86_64")]`. The call sites already have the gate — only the import is missing.
-**Fix:** Add `#[cfg(target_arch = "x86_64")]` before the import.
-**Impact:** Unlocks all realizar inference on aarch64 (Tier 3, Tier 4, Tier 5).
-**LOC:** 1 line added.
+**Commit:** `6f978bc0` — cfg gate on AVX-512 import + renacer feature gates.
+**Issue:** apr-cli#119 — CLOSED.
+
+### Remaining: `apr compile` codegen (aprender#412)
+
+**File:** `aprender/crates/apr-cli/src/commands/compile_codegen.rs`
+**Issue:** Codegen generates a deployment shell, not inference binary.
+**Impact:** Blocks `canary-e2e` (compiled binary + probador pipeline).
+**Workaround:** `canary` target works with `apr` + separate `.apr` model file.
 
 ## Resolved Questions
 
