@@ -269,7 +269,7 @@ resources:
     name: "sovereign-stack-health"
     schedule: "*/15 * * * *"
     command: "/opt/forjar-stack/health-check.sh >> /opt/forjar-stack/health.log 2>&1"
-    user: root
+    owner: root
     depends_on: [health-script]
     tags: [monitoring]
 
