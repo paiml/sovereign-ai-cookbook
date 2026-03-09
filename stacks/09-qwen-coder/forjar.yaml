@@ -204,7 +204,7 @@ resources:
     name: "apr-serve-health"
     schedule: "*/5 * * * *"
     command: "curl -sf http://localhost:{{params.serve_port}}/health || systemctl restart apr-serve"
-    user: root
+    owner: root
     depends_on: [serve-service]
     tags: [monitoring]
 
