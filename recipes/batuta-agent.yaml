@@ -120,8 +120,7 @@ resources:
   batuta-pkg:
     type: package
     provider: cargo
-    packages: [batuta]
-    features: [agents]
+    packages: ["batuta[agents]"]
     depends_on: []
     tags: [packages]
 

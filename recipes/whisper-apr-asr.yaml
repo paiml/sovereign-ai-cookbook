@@ -100,7 +100,7 @@ resources:
   whisper-pkg:
     type: package
     provider: cargo
-    packages: [whisper-apr]
+    packages: ["whisper-apr[cli]"]
     depends_on: []
     tags: [packages]
 
