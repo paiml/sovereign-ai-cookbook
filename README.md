@@ -8,7 +8,7 @@
 
 <p align="center">
   <strong>Forjar deployment configs for the complete PAIML sovereign AI stack.</strong><br/>
-  Zero third-party dependencies. 9 stacks. 12 recipes. 86 resources.
+  17 Rust components -- 10 deployment stacks -- 14 recipes -- zero third-party runtime dependencies.
 </p>
 
 ---
@@ -68,6 +68,7 @@ Each stack is a complete, deployable `forjar.yaml` targeting docker containers. 
 | **[06-full-stack](stacks/06-full-stack/)** | **Complete sovereign AI lab** | **all components** | **86** |
 | [07-data-pipeline](stacks/07-data-pipeline/) | Ingest, train, serve | alimentar, entrenar, realizar | 29 |
 | [08-observability](stacks/08-observability/) | Monitoring and tracing | renacer, Jaeger, Grafana | 10 |
+| [09-edge-inference](stacks/09-edge-inference/) | Jetson Orin Nano edge inference | realizar, trueno | 18 |
 | [09-qwen-coder](stacks/09-qwen-coder/) | Local coding assistant | aprender (apr-cli) | 16 |
 
 ### Clean-Room Test Matrix
@@ -80,32 +81,63 @@ Each stack is a complete, deployable `forjar.yaml` targeting docker containers. 
 |-------|--------|-------|------------|-----------|----------|
 <!-- STACK_MATRIX_END -->
 
-## Nightly Binaries
+## Sovereign Stack Components
 
-Every component ships cross-platform nightly binaries built from `main`. All binaries are statically linked (musl on Linux) and require no runtime dependencies.
+Every component is a standalone Rust binary with zero third-party runtime dependencies. All are published to [crates.io](https://crates.io) and built nightly from `main`.
 
-| Binary | Repo | Platforms | Nightly Release |
-|--------|------|-----------|-----------------|
-| `realizar` | [realizar](https://github.com/paiml/realizar) | Linux, macOS, Windows | [nightly](https://github.com/paiml/realizar/releases/tag/nightly) |
-| `apr` | [aprender](https://github.com/paiml/aprender) | Linux, macOS, Windows | [nightly](https://github.com/paiml/aprender/releases/tag/nightly) |
-| `trueno-monitor` | [trueno](https://github.com/paiml/trueno) | Linux | [nightly](https://github.com/paiml/trueno/releases/tag/nightly) |
-| `trueno-rag` | [trueno-rag](https://github.com/paiml/trueno-rag) | Linux, macOS, Windows | [nightly](https://github.com/paiml/trueno-rag/releases/tag/nightly) |
-| `entrenar` | [entrenar](https://github.com/paiml/entrenar) | Linux, macOS, Windows | [nightly](https://github.com/paiml/entrenar/releases/tag/nightly) |
-| `alimentar` | [alimentar](https://github.com/paiml/alimentar) | Linux, macOS, Windows | [nightly](https://github.com/paiml/alimentar/releases/tag/nightly) |
-| `batuta` | [batuta](https://github.com/paiml/batuta) | Linux, macOS, Windows | [nightly](https://github.com/paiml/batuta/releases/tag/nightly) |
-| `forjar` | [forjar](https://github.com/paiml/forjar) | Linux, macOS, Windows | [nightly](https://github.com/paiml/forjar/releases/tag/nightly) |
-| `pmat` | [paiml-mcp-agent-toolkit](https://github.com/paiml/paiml-mcp-agent-toolkit) | Linux, macOS, Windows | [nightly](https://github.com/paiml/paiml-mcp-agent-toolkit/releases/tag/nightly) |
-| `copia` | [copia](https://github.com/paiml/copia) | Linux, macOS, Windows | [nightly](https://github.com/paiml/copia/releases/tag/nightly) |
-| `pzsh` | [pzsh](https://github.com/paiml/pzsh) | Linux, macOS, Windows | [nightly](https://github.com/paiml/pzsh/releases/tag/nightly) |
-| `renacer` | [renacer](https://github.com/paiml/renacer) | Linux, macOS, Windows | [nightly](https://github.com/paiml/renacer/releases/tag/nightly) |
-| `repartir` | [repartir](https://github.com/paiml/repartir) | Linux, macOS, Windows | [nightly](https://github.com/paiml/repartir/releases/tag/nightly) |
-| `whisper-apr` | [whisper.apr](https://github.com/paiml/whisper.apr) | Linux, macOS, Windows | [nightly](https://github.com/paiml/whisper.apr/releases/tag/nightly) |
-| `pepita` | [pepita](https://github.com/paiml/pepita) | Linux, macOS, Windows | [nightly](https://github.com/paiml/pepita/releases/tag/nightly) |
-| `simular` | [simular](https://github.com/paiml/simular) | Linux, macOS, Windows | [nightly](https://github.com/paiml/simular/releases/tag/nightly) |
-| `pacha` | [pacha](https://github.com/paiml/pacha) | Linux, macOS, Windows | [nightly](https://github.com/paiml/pacha/releases/tag/nightly) |
+| Component | Binary | Version | Layer | Description | crates.io |
+|-----------|--------|---------|-------|-------------|-----------|
+| [realizar](https://github.com/paiml/realizar) | `realizar` | v0.8 | Application | Model serving (GGUF, SafeTensors, CUDA) | [realizar](https://crates.io/crates/realizar) |
+| [aprender](https://github.com/paiml/aprender) | `apr` | v0.27 | ML Core | Model inspection, inference, training CLI | [aprender](https://crates.io/crates/aprender) |
+| [trueno](https://github.com/paiml/trueno) | `trueno-monitor` | v0.16 | Compute | SIMD/GPU engine + TUI monitor | [trueno](https://crates.io/crates/trueno) |
+| [trueno-rag](https://github.com/paiml/trueno-rag) | `trueno-rag` | v0.2 | Application | RAG pipeline (embed, index, query) | [trueno-rag](https://crates.io/crates/trueno-rag) |
+| [entrenar](https://github.com/paiml/entrenar) | `entrenar` | v0.7 | ML Core | Training engine (LoRA, QLoRA, classification) | [entrenar](https://crates.io/crates/entrenar) |
+| [alimentar](https://github.com/paiml/alimentar) | `alimentar` | v0.2 | Data | Ingestion, preprocessing, dedup | [alimentar](https://crates.io/crates/alimentar) |
+| [batuta](https://github.com/paiml/batuta) | `batuta` | v0.6 | Infra | Orchestration, mutation testing, oracle | [batuta](https://crates.io/crates/batuta) |
+| [forjar](https://github.com/paiml/forjar) | `forjar` | v0.5 | Infra | Infrastructure-as-Code provisioning | [forjar](https://crates.io/crates/forjar) |
+| [paiml-mcp-agent-toolkit](https://github.com/paiml/paiml-mcp-agent-toolkit) | `pmat` | v0.4 | Infra | Code quality, work tracking, coverage | [pmat](https://crates.io/crates/pmat) |
+| [copia](https://github.com/paiml/copia) | `copia` | v0.1 | Infra | Sovereign file sync | [copia](https://crates.io/crates/copia) |
+| [pzsh](https://github.com/paiml/pzsh) | `pzsh` | v0.1 | Infra | Sub-10ms shell framework | [pzsh](https://crates.io/crates/pzsh) |
+| [renacer](https://github.com/paiml/renacer) | `renacer` | v0.10 | Infra | Syscall tracing, Jaeger, Grafana | [renacer](https://crates.io/crates/renacer) |
+| [repartir](https://github.com/paiml/repartir) | `repartir` | v2.0 | Compute | Distributed execution workers | [repartir](https://crates.io/crates/repartir) |
+| [whisper.apr](https://github.com/paiml/whisper.apr) | `whisper-apr` | v0.2 | Application | Speech recognition (Whisper) | [whisper-apr](https://crates.io/crates/whisper-apr) |
+| [pepita](https://github.com/paiml/pepita) | `pepita` | v0.1 | Infra | Kernel namespace isolation, seccomp | [pepita](https://crates.io/crates/pepita) |
+| [simular](https://github.com/paiml/simular) | `simular` | v0.3 | Infra | Simulation engine | [simular](https://crates.io/crates/simular) |
+| [pacha](https://github.com/paiml/pacha) | `pacha` | v0.2 | Data | Model/data registry, BLAKE3 checksums | [pacha](https://crates.io/crates/pacha) |
 
-> **Install any binary:** Download from the nightly release page, `chmod +x`, and move to `~/.cargo/bin/` or `/usr/local/bin/`.
-> Or use [forjar](https://github.com/paiml/forjar) with `type: github_release` resources to provision automatically.
+## Nightly Binary Releases
+
+Every component ships cross-platform nightly binaries built from `main` via GitHub Actions. Binaries are statically linked (musl on Linux) and require no runtime dependencies. Status badges show the latest nightly build result.
+
+| Binary | Repo | Layer | Description | Platforms | Nightly |
+|--------|------|-------|-------------|-----------|---------|
+| `realizar` | [realizar](https://github.com/paiml/realizar) | Application | Model serving (GGUF, SafeTensors, CUDA) | Linux, macOS, Windows | [![nightly](https://github.com/paiml/realizar/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/realizar/releases/tag/nightly) |
+| `apr` | [aprender](https://github.com/paiml/aprender) | ML Core | Model inspection, inference, training CLI | Linux, macOS, Windows | [![nightly](https://github.com/paiml/aprender/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/aprender/releases/tag/nightly) |
+| `trueno-monitor` | [trueno](https://github.com/paiml/trueno) | Compute | SIMD/GPU engine + TUI monitor | Linux | [![nightly](https://github.com/paiml/trueno/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/trueno/releases/tag/nightly) |
+| `trueno-rag` | [trueno-rag](https://github.com/paiml/trueno-rag) | Application | RAG pipeline (embed, index, query) | Linux, macOS, Windows | [![nightly](https://github.com/paiml/trueno-rag/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/trueno-rag/releases/tag/nightly) |
+| `entrenar` | [entrenar](https://github.com/paiml/entrenar) | ML Core | Training engine (LoRA, QLoRA, classification) | Linux, macOS, Windows | [![nightly](https://github.com/paiml/entrenar/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/entrenar/releases/tag/nightly) |
+| `alimentar` | [alimentar](https://github.com/paiml/alimentar) | Data | Ingestion, preprocessing, dedup | Linux, macOS, Windows | [![nightly](https://github.com/paiml/alimentar/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/alimentar/releases/tag/nightly) |
+| `batuta` | [batuta](https://github.com/paiml/batuta) | Infra | Orchestration, mutation testing, oracle | Linux, macOS, Windows | [![nightly](https://github.com/paiml/batuta/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/batuta/releases/tag/nightly) |
+| `forjar` | [forjar](https://github.com/paiml/forjar) | Infra | Infrastructure-as-Code provisioning | Linux, macOS, Windows | [![nightly](https://github.com/paiml/forjar/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/forjar/releases/tag/nightly) |
+| `pmat` | [paiml-mcp-agent-toolkit](https://github.com/paiml/paiml-mcp-agent-toolkit) | Infra | Code quality, work tracking, coverage | Linux, macOS, Windows | [![nightly](https://github.com/paiml/paiml-mcp-agent-toolkit/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/paiml-mcp-agent-toolkit/releases/tag/nightly) |
+| `copia` | [copia](https://github.com/paiml/copia) | Infra | Sovereign file sync | Linux, macOS, Windows | [![nightly](https://github.com/paiml/copia/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/copia/releases/tag/nightly) |
+| `pzsh` | [pzsh](https://github.com/paiml/pzsh) | Infra | Sub-10ms shell framework | Linux, macOS, Windows | [![nightly](https://github.com/paiml/pzsh/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/pzsh/releases/tag/nightly) |
+| `renacer` | [renacer](https://github.com/paiml/renacer) | Infra | Syscall tracing, Jaeger, Grafana | Linux, macOS, Windows | [![nightly](https://github.com/paiml/renacer/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/renacer/releases/tag/nightly) |
+| `repartir` | [repartir](https://github.com/paiml/repartir) | Compute | Distributed execution workers | Linux, macOS, Windows | [![nightly](https://github.com/paiml/repartir/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/repartir/releases/tag/nightly) |
+| `whisper-apr` | [whisper.apr](https://github.com/paiml/whisper.apr) | Application | Speech recognition (Whisper) | Linux, macOS, Windows | [![nightly](https://github.com/paiml/whisper.apr/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/whisper.apr/releases/tag/nightly) |
+| `pepita` | [pepita](https://github.com/paiml/pepita) | Infra | Kernel namespace isolation, seccomp | Linux, macOS, Windows | [![nightly](https://github.com/paiml/pepita/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/pepita/releases/tag/nightly) |
+| `simular` | [simular](https://github.com/paiml/simular) | Infra | Simulation engine | Linux, macOS, Windows | [![nightly](https://github.com/paiml/simular/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/simular/releases/tag/nightly) |
+| `pacha` | [pacha](https://github.com/paiml/pacha) | Data | Model/data registry, BLAKE3 checksums | Linux, macOS, Windows | [![nightly](https://github.com/paiml/pacha/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/pacha/releases/tag/nightly) |
+
+> **Install any binary:**
+> ```bash
+> # Download from nightly release (example: forjar on Linux x86_64)
+> curl -L -o forjar https://github.com/paiml/forjar/releases/download/nightly/forjar-x86_64-unknown-linux-musl
+> chmod +x forjar && mv forjar ~/.cargo/bin/
+>
+> # Or provision automatically via forjar (type: github_release)
+> forjar apply -f stacks/06-full-stack/forjar.yaml
+> ```
 
 ## Architecture
 
@@ -133,22 +165,24 @@ See [docs/architecture.md](docs/architecture.md) for data flow diagrams and port
 
 ## Recipes
 
-Reusable building blocks in `recipes/`. Each recipe is machine-agnostic — stacks bind them to specific machines.
+Reusable building blocks in [`recipes/`](recipes/). Each recipe is machine-agnostic -- stacks bind them to specific machines.
 
 | Recipe | Component | What it configures |
 |--------|-----------|-------------------|
-| `realizar-serve` | realizar | GPU model serving (GGUF, safetensors), systemd unit, firewall, health check |
-| `entrenar-train` | entrenar | Training config (learning rate, epochs, LoRA rank), GPU setup, checkpoints |
-| `trueno-rag-pipeline` | trueno-rag | Embedding + retrieval pipeline, backed by trueno-db |
-| `trueno-db-analytics` | trueno-db | Analytics/vector database, WAL, compaction |
-| `alimentar-ingest` | alimentar | Data ingestion, preprocessing, dedup, scheduled cron |
-| `whisper-apr-asr` | whisper-apr | ASR service, model download, VAD, beam search |
-| `pacha-registry` | pacha | Model/data registry, BLAKE3 checksums, GC |
-| `pepita-sandbox` | pepita | Kernel namespace isolation, overlay filesystem, seccomp |
-| `repartir-worker` | repartir | Distributed execution worker, TLS, systemd |
-| `renacer-observability` | renacer | Syscall tracing, Jaeger, Grafana, OTLP |
-| `sovereign-ai-stack` | (meta) | Fleet coordination, health dashboard, inventory |
-| `apr-inference-server` | aprender | GPU inference with model download, BLAKE3 verification |
+| [`realizar-serve`](recipes/realizar-serve.yaml) | realizar | GPU model serving (GGUF, safetensors), systemd unit, firewall, health check |
+| [`entrenar-train`](recipes/entrenar-train.yaml) | entrenar | Training config (learning rate, epochs, LoRA rank), GPU setup, checkpoints |
+| [`trueno-rag-pipeline`](recipes/trueno-rag-pipeline.yaml) | trueno-rag | Embedding + retrieval pipeline, backed by trueno-db |
+| [`trueno-db-analytics`](recipes/trueno-db-analytics.yaml) | trueno-db | Analytics/vector database, WAL, compaction |
+| [`alimentar-ingest`](recipes/alimentar-ingest.yaml) | alimentar | Data ingestion, preprocessing, dedup, scheduled cron |
+| [`whisper-apr-asr`](recipes/whisper-apr-asr.yaml) | whisper-apr | ASR service, model download, VAD, beam search |
+| [`pacha-registry`](recipes/pacha-registry.yaml) | pacha | Model/data registry, BLAKE3 checksums, GC |
+| [`pepita-sandbox`](recipes/pepita-sandbox.yaml) | pepita | Kernel namespace isolation, overlay filesystem, seccomp |
+| [`repartir-worker`](recipes/repartir-worker.yaml) | repartir | Distributed execution worker, TLS, systemd |
+| [`renacer-observability`](recipes/renacer-observability.yaml) | renacer | Syscall tracing, Jaeger, Grafana, OTLP |
+| [`batuta-agent`](recipes/batuta-agent.yaml) | batuta | Autonomous agent runtime, mutation testing daemon |
+| [`jetson-edge-base`](recipes/jetson-edge-base.yaml) | (platform) | Jetson Orin Nano base: JetPack CUDA, Rust toolchain, sovereign tools |
+| [`sovereign-ai-stack`](recipes/sovereign-ai-stack.yaml) | (meta) | Fleet coordination, health dashboard, inventory |
+| [`apr-inference-server`](recipes/apr-inference-server.yaml) | aprender | GPU inference with model download, BLAKE3 verification |
 
 ## Testing
 
@@ -196,9 +230,9 @@ README.md is **auto-generated**. Never edit it directly.
 |----------------|---------------|----------------|
 | README content, layout, badges | `scripts/generate-readme.sh` | Push to main → workflow regenerates |
 | Stack test matrix | *(automatic)* | Clean-room CI injects results between `STACK_MATRIX` markers |
-| Component versions or binaries | `COMPONENTS` array in `scripts/generate-readme.sh` | Push to main → workflow regenerates |
-| CI badges | *(automatic)* | Generated from `COMPONENTS` array |
-| Nightly binary links | *(automatic)* | Generated from `COMPONENTS` array |
+| Component versions, layers, descriptions | `COMPONENTS` array in `scripts/generate-readme.sh` | Push to main → workflow regenerates |
+| CI + nightly badges | *(automatic)* | Generated from `COMPONENTS` array |
+| Component table, nightly links | *(automatic)* | Generated from `COMPONENTS` array |
 
 ```bash
 # Preview locally
@@ -208,14 +242,19 @@ README.md is **auto-generated**. Never edit it directly.
 ./scripts/generate-readme.sh --check
 ```
 
-## PAIML Stack
+## Related Repositories
 
 | Project | Purpose | Link |
 |---------|---------|------|
 | [forjar](https://github.com/paiml/forjar) | Infrastructure as Code (deploys this cookbook) | [Book](https://github.com/paiml/forjar/tree/main/docs/book) |
+| [aprender](https://github.com/paiml/aprender) | ML library (models, inference, training) | [crates.io](https://crates.io/crates/aprender) |
+| [trueno](https://github.com/paiml/trueno) | SIMD/GPU compute engine (pure Rust PTX) | [crates.io](https://crates.io/crates/trueno) |
+| [realizar](https://github.com/paiml/realizar) | Model serving (GGUF, SafeTensors, CUDA) | [crates.io](https://crates.io/crates/realizar) |
+| [entrenar](https://github.com/paiml/entrenar) | Training engine (LoRA, QLoRA) | [crates.io](https://crates.io/crates/entrenar) |
+| [trueno-rag](https://github.com/paiml/trueno-rag) | RAG pipeline (embed, index, query) | [crates.io](https://crates.io/crates/trueno-rag) |
+| [batuta](https://github.com/paiml/batuta) | Orchestration, mutation testing, oracle | [crates.io](https://crates.io/crates/batuta) |
+| [paiml-mcp-agent-toolkit](https://github.com/paiml/paiml-mcp-agent-toolkit) | Code quality, work tracking, coverage | [crates.io](https://crates.io/crates/pmat) |
 | [apr-cookbook](https://github.com/paiml/apr-cookbook) | 202 Rust ML code examples | [Examples](https://github.com/paiml/apr-cookbook/tree/main/examples) |
-| [aprender](https://github.com/paiml/aprender) | ML library (models, inference) | [crates.io](https://crates.io/crates/aprender) |
-| [trueno](https://github.com/paiml/trueno) | SIMD/GPU compute engine | [crates.io](https://crates.io/crates/trueno) |
 
 ## License
 

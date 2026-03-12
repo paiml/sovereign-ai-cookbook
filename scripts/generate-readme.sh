@@ -79,18 +79,37 @@ generate_stack_matrix() {
 
 # ── Nightly binaries table ──────────────────────────────────────────
 generate_binary_table() {
-  echo "| Binary | Repo | Platforms | Nightly Release |"
-  echo "|--------|------|-----------|-----------------|"
+  echo "| Binary | Repo | Layer | Description | Platforms | Nightly |"
+  echo "|--------|------|-------|-------------|-----------|---------|"
   for entry in "${COMPONENTS[@]}"; do
     IFS='|' read -r binary repo version layer desc <<< "$entry"
     local release_url="https://github.com/${ORG}/${repo}/releases/tag/${NIGHTLY_TAG}"
     local repo_url="https://github.com/${ORG}/${repo}"
-    # Platform availability (most have all 4; trueno-monitor is Linux-only)
+    local nightly_badge="https://github.com/${ORG}/${repo}/actions/workflows/nightly.yml/badge.svg"
+    # Platform availability
     local platforms="Linux, macOS, Windows"
     if [[ "$binary" = "trueno-monitor" ]]; then
       platforms="Linux"
     fi
-    echo "| \`${binary}\` | [${repo}](${repo_url}) | ${platforms} | [nightly](${release_url}) |"
+    echo "| \`${binary}\` | [${repo}](${repo_url}) | ${layer} | ${desc} | ${platforms} | [![nightly](${nightly_badge})](${release_url}) |"
+  done
+}
+
+# ── Component stack table (by layer) ──────────────────────────────
+generate_component_table() {
+  echo "| Component | Binary | Version | Layer | Description | crates.io |"
+  echo "|-----------|--------|---------|-------|-------------|-----------|"
+  for entry in "${COMPONENTS[@]}"; do
+    IFS='|' read -r binary repo version layer desc <<< "$entry"
+    local repo_url="https://github.com/${ORG}/${repo}"
+    # crates.io link (repo slug = crate name for most; exceptions mapped)
+    local crate_name="$repo"
+    case "$repo" in
+      paiml-mcp-agent-toolkit) crate_name="pmat" ;;
+      whisper.apr) crate_name="whisper-apr" ;;
+    esac
+    local crate_link="[${crate_name}](https://crates.io/crates/${crate_name})"
+    echo "| [${repo}](${repo_url}) | \`${binary}\` | ${version} | ${layer} | ${desc} | ${crate_link} |"
   done
 }
 
@@ -107,6 +126,7 @@ generate_ci_badges() {
 # ── Generate README ─────────────────────────────────────────────────
 STACK_MATRIX=$(generate_stack_matrix)
 BINARY_TABLE=$(generate_binary_table)
+COMPONENT_TABLE=$(generate_component_table)
 CI_BADGES=$(generate_ci_badges)
 
 cat > "${README}.tmp" << 'HEADER'
@@ -120,7 +140,7 @@ cat > "${README}.tmp" << 'HEADER'
 
 <p align="center">
   <strong>Forjar deployment configs for the complete PAIML sovereign AI stack.</strong><br/>
-  Zero third-party dependencies. 9 stacks. 12 recipes. 86 resources.
+  17 Rust components -- 10 deployment stacks -- 14 recipes -- zero third-party runtime dependencies.
 </p>
 
 HEADER
@@ -167,6 +187,7 @@ Each stack is a complete, deployable \`forjar.yaml\` targeting docker containers
 | **[06-full-stack](stacks/06-full-stack/)** | **Complete sovereign AI lab** | **all components** | **86** |
 | [07-data-pipeline](stacks/07-data-pipeline/) | Ingest, train, serve | alimentar, entrenar, realizar | 29 |
 | [08-observability](stacks/08-observability/) | Monitoring and tracing | renacer, Jaeger, Grafana | 10 |
+| [09-edge-inference](stacks/09-edge-inference/) | Jetson Orin Nano edge inference | realizar, trueno | 18 |
 | [09-qwen-coder](stacks/09-qwen-coder/) | Local coding assistant | aprender (apr-cli) | 16 |
 
 ### Clean-Room Test Matrix
@@ -175,14 +196,27 @@ Each stack is a complete, deployable \`forjar.yaml\` targeting docker containers
 ${STACK_MATRIX}
 <!-- STACK_MATRIX_END -->
 
-## Nightly Binaries
+## Sovereign Stack Components
 
-Every component ships cross-platform nightly binaries built from \`main\`. All binaries are statically linked (musl on Linux) and require no runtime dependencies.
+Every component is a standalone Rust binary with zero third-party runtime dependencies. All are published to [crates.io](https://crates.io) and built nightly from \`main\`.
+
+${COMPONENT_TABLE}
+
+## Nightly Binary Releases
+
+Every component ships cross-platform nightly binaries built from \`main\` via GitHub Actions. Binaries are statically linked (musl on Linux) and require no runtime dependencies. Status badges show the latest nightly build result.
 
 ${BINARY_TABLE}
 
-> **Install any binary:** Download from the nightly release page, \`chmod +x\`, and move to \`~/.cargo/bin/\` or \`/usr/local/bin/\`.
-> Or use [forjar](https://github.com/paiml/forjar) with \`type: github_release\` resources to provision automatically.
+> **Install any binary:**
+> \`\`\`bash
+> # Download from nightly release (example: forjar on Linux x86_64)
+> curl -L -o forjar https://github.com/paiml/forjar/releases/download/nightly/forjar-x86_64-unknown-linux-musl
+> chmod +x forjar && mv forjar ~/.cargo/bin/
+>
+> # Or provision automatically via forjar (type: github_release)
+> forjar apply -f stacks/06-full-stack/forjar.yaml
+> \`\`\`
 
 ## Architecture
 
@@ -210,22 +244,24 @@ See [docs/architecture.md](docs/architecture.md) for data flow diagrams and port
 
 ## Recipes
 
-Reusable building blocks in \`recipes/\`. Each recipe is machine-agnostic — stacks bind them to specific machines.
+Reusable building blocks in [\`recipes/\`](recipes/). Each recipe is machine-agnostic -- stacks bind them to specific machines.
 
 | Recipe | Component | What it configures |
 |--------|-----------|-------------------|
-| \`realizar-serve\` | realizar | GPU model serving (GGUF, safetensors), systemd unit, firewall, health check |
-| \`entrenar-train\` | entrenar | Training config (learning rate, epochs, LoRA rank), GPU setup, checkpoints |
-| \`trueno-rag-pipeline\` | trueno-rag | Embedding + retrieval pipeline, backed by trueno-db |
-| \`trueno-db-analytics\` | trueno-db | Analytics/vector database, WAL, compaction |
-| \`alimentar-ingest\` | alimentar | Data ingestion, preprocessing, dedup, scheduled cron |
-| \`whisper-apr-asr\` | whisper-apr | ASR service, model download, VAD, beam search |
-| \`pacha-registry\` | pacha | Model/data registry, BLAKE3 checksums, GC |
-| \`pepita-sandbox\` | pepita | Kernel namespace isolation, overlay filesystem, seccomp |
-| \`repartir-worker\` | repartir | Distributed execution worker, TLS, systemd |
-| \`renacer-observability\` | renacer | Syscall tracing, Jaeger, Grafana, OTLP |
-| \`sovereign-ai-stack\` | (meta) | Fleet coordination, health dashboard, inventory |
-| \`apr-inference-server\` | aprender | GPU inference with model download, BLAKE3 verification |
+| [\`realizar-serve\`](recipes/realizar-serve.yaml) | realizar | GPU model serving (GGUF, safetensors), systemd unit, firewall, health check |
+| [\`entrenar-train\`](recipes/entrenar-train.yaml) | entrenar | Training config (learning rate, epochs, LoRA rank), GPU setup, checkpoints |
+| [\`trueno-rag-pipeline\`](recipes/trueno-rag-pipeline.yaml) | trueno-rag | Embedding + retrieval pipeline, backed by trueno-db |
+| [\`trueno-db-analytics\`](recipes/trueno-db-analytics.yaml) | trueno-db | Analytics/vector database, WAL, compaction |
+| [\`alimentar-ingest\`](recipes/alimentar-ingest.yaml) | alimentar | Data ingestion, preprocessing, dedup, scheduled cron |
+| [\`whisper-apr-asr\`](recipes/whisper-apr-asr.yaml) | whisper-apr | ASR service, model download, VAD, beam search |
+| [\`pacha-registry\`](recipes/pacha-registry.yaml) | pacha | Model/data registry, BLAKE3 checksums, GC |
+| [\`pepita-sandbox\`](recipes/pepita-sandbox.yaml) | pepita | Kernel namespace isolation, overlay filesystem, seccomp |
+| [\`repartir-worker\`](recipes/repartir-worker.yaml) | repartir | Distributed execution worker, TLS, systemd |
+| [\`renacer-observability\`](recipes/renacer-observability.yaml) | renacer | Syscall tracing, Jaeger, Grafana, OTLP |
+| [\`batuta-agent\`](recipes/batuta-agent.yaml) | batuta | Autonomous agent runtime, mutation testing daemon |
+| [\`jetson-edge-base\`](recipes/jetson-edge-base.yaml) | (platform) | Jetson Orin Nano base: JetPack CUDA, Rust toolchain, sovereign tools |
+| [\`sovereign-ai-stack\`](recipes/sovereign-ai-stack.yaml) | (meta) | Fleet coordination, health dashboard, inventory |
+| [\`apr-inference-server\`](recipes/apr-inference-server.yaml) | aprender | GPU inference with model download, BLAKE3 verification |
 
 ## Testing
 
@@ -273,9 +309,9 @@ README.md is **auto-generated**. Never edit it directly.
 |----------------|---------------|----------------|
 | README content, layout, badges | \`scripts/generate-readme.sh\` | Push to main → workflow regenerates |
 | Stack test matrix | *(automatic)* | Clean-room CI injects results between \`STACK_MATRIX\` markers |
-| Component versions or binaries | \`COMPONENTS\` array in \`scripts/generate-readme.sh\` | Push to main → workflow regenerates |
-| CI badges | *(automatic)* | Generated from \`COMPONENTS\` array |
-| Nightly binary links | *(automatic)* | Generated from \`COMPONENTS\` array |
+| Component versions, layers, descriptions | \`COMPONENTS\` array in \`scripts/generate-readme.sh\` | Push to main → workflow regenerates |
+| CI + nightly badges | *(automatic)* | Generated from \`COMPONENTS\` array |
+| Component table, nightly links | *(automatic)* | Generated from \`COMPONENTS\` array |
 
 \`\`\`bash
 # Preview locally
@@ -285,14 +321,19 @@ README.md is **auto-generated**. Never edit it directly.
 ./scripts/generate-readme.sh --check
 \`\`\`
 
-## PAIML Stack
+## Related Repositories
 
 | Project | Purpose | Link |
 |---------|---------|------|
 | [forjar](https://github.com/paiml/forjar) | Infrastructure as Code (deploys this cookbook) | [Book](https://github.com/paiml/forjar/tree/main/docs/book) |
+| [aprender](https://github.com/paiml/aprender) | ML library (models, inference, training) | [crates.io](https://crates.io/crates/aprender) |
+| [trueno](https://github.com/paiml/trueno) | SIMD/GPU compute engine (pure Rust PTX) | [crates.io](https://crates.io/crates/trueno) |
+| [realizar](https://github.com/paiml/realizar) | Model serving (GGUF, SafeTensors, CUDA) | [crates.io](https://crates.io/crates/realizar) |
+| [entrenar](https://github.com/paiml/entrenar) | Training engine (LoRA, QLoRA) | [crates.io](https://crates.io/crates/entrenar) |
+| [trueno-rag](https://github.com/paiml/trueno-rag) | RAG pipeline (embed, index, query) | [crates.io](https://crates.io/crates/trueno-rag) |
+| [batuta](https://github.com/paiml/batuta) | Orchestration, mutation testing, oracle | [crates.io](https://crates.io/crates/batuta) |
+| [paiml-mcp-agent-toolkit](https://github.com/paiml/paiml-mcp-agent-toolkit) | Code quality, work tracking, coverage | [crates.io](https://crates.io/crates/pmat) |
 | [apr-cookbook](https://github.com/paiml/apr-cookbook) | 202 Rust ML code examples | [Examples](https://github.com/paiml/apr-cookbook/tree/main/examples) |
-| [aprender](https://github.com/paiml/aprender) | ML library (models, inference) | [crates.io](https://crates.io/crates/aprender) |
-| [trueno](https://github.com/paiml/trueno) | SIMD/GPU compute engine | [crates.io](https://crates.io/crates/trueno) |
 
 ## License
 
