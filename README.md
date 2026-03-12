@@ -79,7 +79,7 @@ Each stack is a complete, deployable `forjar.yaml` targeting docker containers. 
 
 <!-- STACK_MATRIX_START -->
 
-**Stack Matrix** — 1/1 pass (updated: 2026-03-12 09:29 UTC)
+**Stack Matrix** — 1/1 pass (updated: 2026-03-12 11:25 UTC)
 
 | Stack | Status | Apply | Idempotent | Resources | Duration |
 |-------|--------|-------|------------|-----------|----------|
