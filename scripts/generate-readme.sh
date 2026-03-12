@@ -44,8 +44,8 @@ COMPONENTS=(
   "renacer|renacer|v0.10|Infra|Syscall tracing, Jaeger, Grafana|ci.yml"
   "repartir|repartir|v2.0|Compute|Distributed execution workers|jidoka-gates.yml"
   "whisper-apr|whisper.apr|v0.2|Application|Speech recognition (Whisper)|ci.yml"
-  "pepita|pepita|v0.1|Infra|Kernel namespace isolation, seccomp|ci.yml"
-  "simular|simular|v0.3|Infra|Simulation engine|jidoka-gates.yml"
+  "pepita|pepita|v0.1|Infra|Kernel namespace isolation, seccomp|jidoka-gates.yml"
+  "simular|simular|v0.3|Infra|Simulation engine|ci.yml"
   "pacha|pacha|v0.2|Data|Model/data registry, BLAKE3 checksums|ci.yml"
 )
 
