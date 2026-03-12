@@ -1,0 +1,36 @@
+name: Generate README
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/generate-readme.sh'
+      - 'stacks/**'
+      - 'recipes/**'
+  schedule:
+    - cron: '30 4 * * *'  # daily, 30min after nightly builds
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate README.md
+        run: ./scripts/generate-readme.sh
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet README.md; then
+            echo "README.md unchanged, nothing to commit."
+          else
+            git add README.md
+            git commit -m "chore: regenerate README.md [auto]"
+            git push
+          fi
