@@ -13,25 +13,29 @@
 
 ---
 
-## CI Status
+## Status Dashboard
 
-[![realizar CI](https://github.com/paiml/realizar/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/realizar/actions/workflows/ci.yml)
-[![aprender CI](https://github.com/paiml/aprender/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/aprender/actions/workflows/ci.yml)
-[![trueno CI](https://github.com/paiml/trueno/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/trueno/actions/workflows/ci.yml)
-[![trueno-rag CI](https://github.com/paiml/trueno-rag/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/trueno-rag/actions/workflows/ci.yml)
-[![entrenar CI](https://github.com/paiml/entrenar/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/entrenar/actions/workflows/ci.yml)
-[![alimentar CI](https://github.com/paiml/alimentar/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/alimentar/actions/workflows/ci.yml)
-[![batuta CI](https://github.com/paiml/batuta/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/batuta/actions/workflows/ci.yml)
-[![forjar CI](https://github.com/paiml/forjar/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/forjar/actions/workflows/ci.yml)
-[![paiml-mcp-agent-toolkit CI](https://github.com/paiml/paiml-mcp-agent-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/paiml-mcp-agent-toolkit/actions/workflows/ci.yml)
-[![copia CI](https://github.com/paiml/copia/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/copia/actions/workflows/ci.yml)
-[![pzsh CI](https://github.com/paiml/pzsh/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/pzsh/actions/workflows/ci.yml)
-[![renacer CI](https://github.com/paiml/renacer/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/renacer/actions/workflows/ci.yml)
-[![repartir CI](https://github.com/paiml/repartir/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/repartir/actions/workflows/ci.yml)
-[![whisper.apr CI](https://github.com/paiml/whisper.apr/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/whisper.apr/actions/workflows/ci.yml)
-[![pepita CI](https://github.com/paiml/pepita/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/pepita/actions/workflows/ci.yml)
-[![simular CI](https://github.com/paiml/simular/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/simular/actions/workflows/ci.yml)
-[![pacha CI](https://github.com/paiml/pacha/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/pacha/actions/workflows/ci.yml)
+All CI and nightly build status across the sovereign stack.
+
+| Component | Binary | CI | Nightly |
+|-----------|--------|----|---------|
+| [realizar](https://github.com/paiml/realizar) | `realizar` | [![CI](https://github.com/paiml/realizar/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/realizar/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/realizar/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/realizar/releases/tag/nightly) |
+| [aprender](https://github.com/paiml/aprender) | `apr` | [![CI](https://github.com/paiml/aprender/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/aprender/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/aprender/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/aprender/releases/tag/nightly) |
+| [trueno](https://github.com/paiml/trueno) | `trueno-monitor` | [![CI](https://github.com/paiml/trueno/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/trueno/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/trueno/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/trueno/releases/tag/nightly) |
+| [trueno-rag](https://github.com/paiml/trueno-rag) | `trueno-rag` | [![CI](https://github.com/paiml/trueno-rag/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/trueno-rag/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/trueno-rag/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/trueno-rag/releases/tag/nightly) |
+| [entrenar](https://github.com/paiml/entrenar) | `entrenar` | [![CI](https://github.com/paiml/entrenar/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/entrenar/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/entrenar/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/entrenar/releases/tag/nightly) |
+| [alimentar](https://github.com/paiml/alimentar) | `alimentar` | [![CI](https://github.com/paiml/alimentar/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/alimentar/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/alimentar/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/alimentar/releases/tag/nightly) |
+| [batuta](https://github.com/paiml/batuta) | `batuta` | [![CI](https://github.com/paiml/batuta/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/batuta/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/batuta/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/batuta/releases/tag/nightly) |
+| [forjar](https://github.com/paiml/forjar) | `forjar` | [![CI](https://github.com/paiml/forjar/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/forjar/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/forjar/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/forjar/releases/tag/nightly) |
+| [paiml-mcp-agent-toolkit](https://github.com/paiml/paiml-mcp-agent-toolkit) | `pmat` | [![CI](https://github.com/paiml/paiml-mcp-agent-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/paiml-mcp-agent-toolkit/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/paiml-mcp-agent-toolkit/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/paiml-mcp-agent-toolkit/releases/tag/nightly) |
+| [copia](https://github.com/paiml/copia) | `copia` | [![CI](https://github.com/paiml/copia/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/copia/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/copia/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/copia/releases/tag/nightly) |
+| [pzsh](https://github.com/paiml/pzsh) | `pzsh` | [![CI](https://github.com/paiml/pzsh/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/pzsh/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/pzsh/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/pzsh/releases/tag/nightly) |
+| [renacer](https://github.com/paiml/renacer) | `renacer` | [![CI](https://github.com/paiml/renacer/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/renacer/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/renacer/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/renacer/releases/tag/nightly) |
+| [repartir](https://github.com/paiml/repartir) | `repartir` | [![CI](https://github.com/paiml/repartir/actions/workflows/jidoka-gates.yml/badge.svg)](https://github.com/paiml/repartir/actions/workflows/jidoka-gates.yml) | [![Nightly](https://github.com/paiml/repartir/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/repartir/releases/tag/nightly) |
+| [whisper.apr](https://github.com/paiml/whisper.apr) | `whisper-apr` | [![CI](https://github.com/paiml/whisper.apr/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/whisper.apr/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/whisper.apr/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/whisper.apr/releases/tag/nightly) |
+| [pepita](https://github.com/paiml/pepita) | `pepita` | [![CI](https://github.com/paiml/pepita/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/pepita/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/pepita/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/pepita/releases/tag/nightly) |
+| [simular](https://github.com/paiml/simular) | `simular` | [![CI](https://github.com/paiml/simular/actions/workflows/jidoka-gates.yml/badge.svg)](https://github.com/paiml/simular/actions/workflows/jidoka-gates.yml) | [![Nightly](https://github.com/paiml/simular/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/simular/releases/tag/nightly) |
+| [pacha](https://github.com/paiml/pacha) | `pacha` | [![CI](https://github.com/paiml/pacha/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/pacha/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/pacha/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/pacha/releases/tag/nightly) |
 
 ---
 
@@ -107,27 +111,27 @@ Every component is a standalone Rust binary with zero third-party runtime depend
 
 ## Nightly Binary Releases
 
-Every component ships cross-platform nightly binaries built from `main` via GitHub Actions. Binaries are statically linked (musl on Linux) and require no runtime dependencies. Status badges show the latest nightly build result.
+Every component ships cross-platform nightly binaries built from `main` via GitHub Actions. Binaries are statically linked (musl on Linux) and require no runtime dependencies.
 
-| Binary | Repo | Layer | Description | Platforms | Nightly |
-|--------|------|-------|-------------|-----------|---------|
-| `realizar` | [realizar](https://github.com/paiml/realizar) | Application | Model serving (GGUF, SafeTensors, CUDA) | Linux, macOS, Windows | [![nightly](https://github.com/paiml/realizar/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/realizar/releases/tag/nightly) |
-| `apr` | [aprender](https://github.com/paiml/aprender) | ML Core | Model inspection, inference, training CLI | Linux, macOS, Windows | [![nightly](https://github.com/paiml/aprender/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/aprender/releases/tag/nightly) |
-| `trueno-monitor` | [trueno](https://github.com/paiml/trueno) | Compute | SIMD/GPU engine + TUI monitor | Linux | [![nightly](https://github.com/paiml/trueno/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/trueno/releases/tag/nightly) |
-| `trueno-rag` | [trueno-rag](https://github.com/paiml/trueno-rag) | Application | RAG pipeline (embed, index, query) | Linux, macOS, Windows | [![nightly](https://github.com/paiml/trueno-rag/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/trueno-rag/releases/tag/nightly) |
-| `entrenar` | [entrenar](https://github.com/paiml/entrenar) | ML Core | Training engine (LoRA, QLoRA, classification) | Linux, macOS, Windows | [![nightly](https://github.com/paiml/entrenar/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/entrenar/releases/tag/nightly) |
-| `alimentar` | [alimentar](https://github.com/paiml/alimentar) | Data | Ingestion, preprocessing, dedup | Linux, macOS, Windows | [![nightly](https://github.com/paiml/alimentar/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/alimentar/releases/tag/nightly) |
-| `batuta` | [batuta](https://github.com/paiml/batuta) | Infra | Orchestration, mutation testing, oracle | Linux, macOS, Windows | [![nightly](https://github.com/paiml/batuta/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/batuta/releases/tag/nightly) |
-| `forjar` | [forjar](https://github.com/paiml/forjar) | Infra | Infrastructure-as-Code provisioning | Linux, macOS, Windows | [![nightly](https://github.com/paiml/forjar/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/forjar/releases/tag/nightly) |
-| `pmat` | [paiml-mcp-agent-toolkit](https://github.com/paiml/paiml-mcp-agent-toolkit) | Infra | Code quality, work tracking, coverage | Linux, macOS, Windows | [![nightly](https://github.com/paiml/paiml-mcp-agent-toolkit/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/paiml-mcp-agent-toolkit/releases/tag/nightly) |
-| `copia` | [copia](https://github.com/paiml/copia) | Infra | Sovereign file sync | Linux, macOS, Windows | [![nightly](https://github.com/paiml/copia/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/copia/releases/tag/nightly) |
-| `pzsh` | [pzsh](https://github.com/paiml/pzsh) | Infra | Sub-10ms shell framework | Linux, macOS, Windows | [![nightly](https://github.com/paiml/pzsh/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/pzsh/releases/tag/nightly) |
-| `renacer` | [renacer](https://github.com/paiml/renacer) | Infra | Syscall tracing, Jaeger, Grafana | Linux, macOS, Windows | [![nightly](https://github.com/paiml/renacer/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/renacer/releases/tag/nightly) |
-| `repartir` | [repartir](https://github.com/paiml/repartir) | Compute | Distributed execution workers | Linux, macOS, Windows | [![nightly](https://github.com/paiml/repartir/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/repartir/releases/tag/nightly) |
-| `whisper-apr` | [whisper.apr](https://github.com/paiml/whisper.apr) | Application | Speech recognition (Whisper) | Linux, macOS, Windows | [![nightly](https://github.com/paiml/whisper.apr/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/whisper.apr/releases/tag/nightly) |
-| `pepita` | [pepita](https://github.com/paiml/pepita) | Infra | Kernel namespace isolation, seccomp | Linux, macOS, Windows | [![nightly](https://github.com/paiml/pepita/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/pepita/releases/tag/nightly) |
-| `simular` | [simular](https://github.com/paiml/simular) | Infra | Simulation engine | Linux, macOS, Windows | [![nightly](https://github.com/paiml/simular/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/simular/releases/tag/nightly) |
-| `pacha` | [pacha](https://github.com/paiml/pacha) | Data | Model/data registry, BLAKE3 checksums | Linux, macOS, Windows | [![nightly](https://github.com/paiml/pacha/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/pacha/releases/tag/nightly) |
+| Binary | Repo | Layer | Description | Platforms |
+|--------|------|-------|-------------|-----------|
+| `realizar` | [realizar](https://github.com/paiml/realizar) | Application | Model serving (GGUF, SafeTensors, CUDA) | Linux, macOS, Windows |
+| `apr` | [aprender](https://github.com/paiml/aprender) | ML Core | Model inspection, inference, training CLI | Linux, macOS, Windows |
+| `trueno-monitor` | [trueno](https://github.com/paiml/trueno) | Compute | SIMD/GPU engine + TUI monitor | Linux |
+| `trueno-rag` | [trueno-rag](https://github.com/paiml/trueno-rag) | Application | RAG pipeline (embed, index, query) | Linux, macOS, Windows |
+| `entrenar` | [entrenar](https://github.com/paiml/entrenar) | ML Core | Training engine (LoRA, QLoRA, classification) | Linux, macOS, Windows |
+| `alimentar` | [alimentar](https://github.com/paiml/alimentar) | Data | Ingestion, preprocessing, dedup | Linux, macOS, Windows |
+| `batuta` | [batuta](https://github.com/paiml/batuta) | Infra | Orchestration, mutation testing, oracle | Linux, macOS, Windows |
+| `forjar` | [forjar](https://github.com/paiml/forjar) | Infra | Infrastructure-as-Code provisioning | Linux, macOS, Windows |
+| `pmat` | [paiml-mcp-agent-toolkit](https://github.com/paiml/paiml-mcp-agent-toolkit) | Infra | Code quality, work tracking, coverage | Linux, macOS, Windows |
+| `copia` | [copia](https://github.com/paiml/copia) | Infra | Sovereign file sync | Linux, macOS, Windows |
+| `pzsh` | [pzsh](https://github.com/paiml/pzsh) | Infra | Sub-10ms shell framework | Linux, macOS, Windows |
+| `renacer` | [renacer](https://github.com/paiml/renacer) | Infra | Syscall tracing, Jaeger, Grafana | Linux, macOS, Windows |
+| `repartir` | [repartir](https://github.com/paiml/repartir) | Compute | Distributed execution workers | Linux, macOS, Windows |
+| `whisper-apr` | [whisper.apr](https://github.com/paiml/whisper.apr) | Application | Speech recognition (Whisper) | Linux, macOS, Windows |
+| `pepita` | [pepita](https://github.com/paiml/pepita) | Infra | Kernel namespace isolation, seccomp | Linux, macOS, Windows |
+| `simular` | [simular](https://github.com/paiml/simular) | Infra | Simulation engine | Linux, macOS, Windows |
+| `pacha` | [pacha](https://github.com/paiml/pacha) | Data | Model/data registry, BLAKE3 checksums | Linux, macOS, Windows |
 
 > **Install any binary:**
 > ```bash

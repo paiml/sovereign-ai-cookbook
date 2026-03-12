@@ -27,25 +27,26 @@ ORG="paiml"
 NIGHTLY_TAG="nightly"
 
 # ── Component registry ──────────────────────────────────────────────
-# Format: "binary|repo_slug|version|layer|description"
+# Format: "binary|repo_slug|version|layer|description|ci_workflow"
+# ci_workflow: the YAML filename for the CI badge (most use ci.yml)
 COMPONENTS=(
-  "realizar|realizar|v0.8|Application|Model serving (GGUF, SafeTensors, CUDA)"
-  "apr|aprender|v0.27|ML Core|Model inspection, inference, training CLI"
-  "trueno-monitor|trueno|v0.16|Compute|SIMD/GPU engine + TUI monitor"
-  "trueno-rag|trueno-rag|v0.2|Application|RAG pipeline (embed, index, query)"
-  "entrenar|entrenar|v0.7|ML Core|Training engine (LoRA, QLoRA, classification)"
-  "alimentar|alimentar|v0.2|Data|Ingestion, preprocessing, dedup"
-  "batuta|batuta|v0.6|Infra|Orchestration, mutation testing, oracle"
-  "forjar|forjar|v0.5|Infra|Infrastructure-as-Code provisioning"
-  "pmat|paiml-mcp-agent-toolkit|v0.4|Infra|Code quality, work tracking, coverage"
-  "copia|copia|v0.1|Infra|Sovereign file sync"
-  "pzsh|pzsh|v0.1|Infra|Sub-10ms shell framework"
-  "renacer|renacer|v0.10|Infra|Syscall tracing, Jaeger, Grafana"
-  "repartir|repartir|v2.0|Compute|Distributed execution workers"
-  "whisper-apr|whisper.apr|v0.2|Application|Speech recognition (Whisper)"
-  "pepita|pepita|v0.1|Infra|Kernel namespace isolation, seccomp"
-  "simular|simular|v0.3|Infra|Simulation engine"
-  "pacha|pacha|v0.2|Data|Model/data registry, BLAKE3 checksums"
+  "realizar|realizar|v0.8|Application|Model serving (GGUF, SafeTensors, CUDA)|ci.yml"
+  "apr|aprender|v0.27|ML Core|Model inspection, inference, training CLI|ci.yml"
+  "trueno-monitor|trueno|v0.16|Compute|SIMD/GPU engine + TUI monitor|ci.yml"
+  "trueno-rag|trueno-rag|v0.2|Application|RAG pipeline (embed, index, query)|ci.yml"
+  "entrenar|entrenar|v0.7|ML Core|Training engine (LoRA, QLoRA, classification)|ci.yml"
+  "alimentar|alimentar|v0.2|Data|Ingestion, preprocessing, dedup|ci.yml"
+  "batuta|batuta|v0.6|Infra|Orchestration, mutation testing, oracle|ci.yml"
+  "forjar|forjar|v0.5|Infra|Infrastructure-as-Code provisioning|ci.yml"
+  "pmat|paiml-mcp-agent-toolkit|v0.4|Infra|Code quality, work tracking, coverage|ci.yml"
+  "copia|copia|v0.1|Infra|Sovereign file sync|ci.yml"
+  "pzsh|pzsh|v0.1|Infra|Sub-10ms shell framework|ci.yml"
+  "renacer|renacer|v0.10|Infra|Syscall tracing, Jaeger, Grafana|ci.yml"
+  "repartir|repartir|v2.0|Compute|Distributed execution workers|jidoka-gates.yml"
+  "whisper-apr|whisper.apr|v0.2|Application|Speech recognition (Whisper)|ci.yml"
+  "pepita|pepita|v0.1|Infra|Kernel namespace isolation, seccomp|ci.yml"
+  "simular|simular|v0.3|Infra|Simulation engine|jidoka-gates.yml"
+  "pacha|pacha|v0.2|Data|Model/data registry, BLAKE3 checksums|ci.yml"
 )
 
 # ── Stack matrix (injected by clean-room CI between markers) ────────
@@ -77,21 +78,34 @@ generate_stack_matrix() {
   fi
 }
 
+# ── Status dashboard table (CI + Nightly in one place) ──────────────
+generate_status_dashboard() {
+  echo "| Component | Binary | CI | Nightly |"
+  echo "|-----------|--------|----|---------|"
+  for entry in "${COMPONENTS[@]}"; do
+    IFS='|' read -r binary repo version layer desc ci_wf <<< "$entry"
+    local repo_url="https://github.com/${ORG}/${repo}"
+    local ci_badge="https://github.com/${ORG}/${repo}/actions/workflows/${ci_wf}/badge.svg"
+    local ci_url="https://github.com/${ORG}/${repo}/actions/workflows/${ci_wf}"
+    local nightly_badge="https://github.com/${ORG}/${repo}/actions/workflows/nightly.yml/badge.svg"
+    local nightly_url="https://github.com/${ORG}/${repo}/releases/tag/${NIGHTLY_TAG}"
+    echo "| [${repo}](${repo_url}) | \`${binary}\` | [![CI](${ci_badge})](${ci_url}) | [![Nightly](${nightly_badge})](${nightly_url}) |"
+  done
+}
+
 # ── Nightly binaries table ──────────────────────────────────────────
 generate_binary_table() {
-  echo "| Binary | Repo | Layer | Description | Platforms | Nightly |"
-  echo "|--------|------|-------|-------------|-----------|---------|"
+  echo "| Binary | Repo | Layer | Description | Platforms |"
+  echo "|--------|------|-------|-------------|-----------|"
   for entry in "${COMPONENTS[@]}"; do
-    IFS='|' read -r binary repo version layer desc <<< "$entry"
-    local release_url="https://github.com/${ORG}/${repo}/releases/tag/${NIGHTLY_TAG}"
+    IFS='|' read -r binary repo version layer desc ci_wf <<< "$entry"
     local repo_url="https://github.com/${ORG}/${repo}"
-    local nightly_badge="https://github.com/${ORG}/${repo}/actions/workflows/nightly.yml/badge.svg"
     # Platform availability
     local platforms="Linux, macOS, Windows"
     if [[ "$binary" = "trueno-monitor" ]]; then
       platforms="Linux"
     fi
-    echo "| \`${binary}\` | [${repo}](${repo_url}) | ${layer} | ${desc} | ${platforms} | [![nightly](${nightly_badge})](${release_url}) |"
+    echo "| \`${binary}\` | [${repo}](${repo_url}) | ${layer} | ${desc} | ${platforms} |"
   done
 }
 
@@ -100,7 +114,7 @@ generate_component_table() {
   echo "| Component | Binary | Version | Layer | Description | crates.io |"
   echo "|-----------|--------|---------|-------|-------------|-----------|"
   for entry in "${COMPONENTS[@]}"; do
-    IFS='|' read -r binary repo version layer desc <<< "$entry"
+    IFS='|' read -r binary repo version layer desc ci_wf <<< "$entry"
     local repo_url="https://github.com/${ORG}/${repo}"
     # crates.io link (repo slug = crate name for most; exceptions mapped)
     local crate_name="$repo"
@@ -113,21 +127,11 @@ generate_component_table() {
   done
 }
 
-# ── CI status badges ────────────────────────────────────────────────
-generate_ci_badges() {
-  for entry in "${COMPONENTS[@]}"; do
-    IFS='|' read -r binary repo version layer desc <<< "$entry"
-    local badge_url="https://github.com/${ORG}/${repo}/actions/workflows/ci.yml/badge.svg"
-    local workflow_url="https://github.com/${ORG}/${repo}/actions/workflows/ci.yml"
-    printf '[![%s CI](%s)](%s)\n' "$repo" "$badge_url" "$workflow_url"
-  done
-}
-
 # ── Generate README ─────────────────────────────────────────────────
 STACK_MATRIX=$(generate_stack_matrix)
 BINARY_TABLE=$(generate_binary_table)
 COMPONENT_TABLE=$(generate_component_table)
-CI_BADGES=$(generate_ci_badges)
+STATUS_DASHBOARD=$(generate_status_dashboard)
 
 cat > "${README}.tmp" << 'HEADER'
 <!-- AUTO-GENERATED by scripts/generate-readme.sh — do NOT edit manually.
@@ -148,9 +152,11 @@ HEADER
 cat >> "${README}.tmp" << EOF
 ---
 
-## CI Status
+## Status Dashboard
 
-${CI_BADGES}
+All CI and nightly build status across the sovereign stack.
+
+${STATUS_DASHBOARD}
 
 ---
 
@@ -204,7 +210,7 @@ ${COMPONENT_TABLE}
 
 ## Nightly Binary Releases
 
-Every component ships cross-platform nightly binaries built from \`main\` via GitHub Actions. Binaries are statically linked (musl on Linux) and require no runtime dependencies. Status badges show the latest nightly build result.
+Every component ships cross-platform nightly binaries built from \`main\` via GitHub Actions. Binaries are statically linked (musl on Linux) and require no runtime dependencies.
 
 ${BINARY_TABLE}
 
