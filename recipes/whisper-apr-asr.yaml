@@ -106,6 +106,7 @@ resources:
 
   config:
     type: file
+    state: file
     path: /opt/whisper-apr/config.yaml
     content: |
       # whisper-apr configuration
