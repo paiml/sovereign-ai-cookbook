@@ -1,9 +1,9 @@
-# Recipe: trueno-rag-pipeline — RAG pipeline with trueno-rag + trueno-db
+# Recipe: trueno-rag-pipeline — RAG pipeline with trueno-rag
 #
-# Deploys a complete retrieval-augmented generation pipeline:
-#   1. trueno-db analytics database for embeddings
-#   2. trueno-rag embedding + retrieval service
-#   3. Configuration, systemd units, firewall rules
+# Deploys the trueno-rag retrieval service (assumes trueno-db is provided
+# by the trueno-db-analytics recipe via the vector-db stack layer):
+#   1. trueno-rag embedding + retrieval service
+#   2. Configuration, systemd unit, firewall rules
 #
 # Inputs:
 #   db_port (int, default: 5433) — trueno-db listen port
@@ -127,29 +127,6 @@ resources:
     depends_on: [rag-data-dir]
     tags: [config]
 
-  db-systemd-unit:
-    type: file
-    path: /etc/systemd/system/trueno-db.service
-    content: |
-      [Unit]
-      Description=Trueno Analytics Database
-      After=network.target
-
-      [Service]
-      Type=simple
-      User={{inputs.user}}
-      ExecStart=/usr/local/bin/trueno-db --config /opt/trueno/db-config.yaml
-      Restart=on-failure
-      RestartSec=5
-      LimitNOFILE=65535
-
-      [Install]
-      WantedBy=multi-user.target
-    owner: root
-    mode: "0644"
-    depends_on: [trueno-db-pkg, db-config]
-    tags: [config, systemd]
-
   rag-systemd-unit:
     type: file
     path: /etc/systemd/system/trueno-rag.service
@@ -171,17 +148,8 @@ resources:
       WantedBy=multi-user.target
     owner: root
     mode: "0644"
-    depends_on: [trueno-rag-pkg, rag-config, db-systemd-unit]
+    depends_on: [trueno-rag-pkg, rag-config]
     tags: [config, systemd]
-
-  db-service:
-    type: service
-    name: trueno-db
-    state: running
-    enabled: true
-    restart_on: [db-systemd-unit, db-config]
-    depends_on: [db-systemd-unit]
-    tags: [services]
 
   rag-service:
     type: service
@@ -189,16 +157,8 @@ resources:
     state: running
     enabled: true
     restart_on: [rag-systemd-unit, rag-config]
-    depends_on: [rag-systemd-unit, db-service]
+    depends_on: [rag-systemd-unit]
     tags: [services]
-
-  firewall-db:
-    type: network
-    port: "{{inputs.db_port}}"
-    protocol: tcp
-    action: allow
-    depends_on: [db-service]
-    tags: [network, firewall]
 
   firewall-rag:
     type: network
