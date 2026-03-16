@@ -88,8 +88,7 @@ resources:
   maxn-super:
     type: task
     machine: jetson
-    command: "nvpmodel -m 0 2>/dev/null || true && jetson_clocks 2>/dev/null || true"
-    run_as: root
+    command: "sudo nvpmodel -m 0 2>/dev/null || true && sudo jetson_clocks 2>/dev/null || true"
     depends_on: [base]
     tags: [edge, power]
 
@@ -100,6 +99,7 @@ resources:
     path: /etc/ssh/sshd_config.d/forjar-edge.conf
     owner: root
     mode: '0644'
+    sudo: true
     content: |
       PermitRootLogin no
       PasswordAuthentication no
@@ -125,7 +125,7 @@ resources:
     type: task
     machine: intel
     command: "rustup target add {{params.cross_target}}"
-    check: "rustup target list --installed | grep -q {{params.cross_target}}"
+    completion_check: "rustup target list --installed | grep -q {{params.cross_target}}"
     depends_on: [cross-compile-deps]
     tags: [builder, cross-compile]
 
@@ -134,7 +134,7 @@ resources:
     type: task
     machine: intel
     command: "rustup +nightly target add {{params.cross_target}}"
-    check: "rustup +nightly target list --installed | grep -q {{params.cross_target}}"
+    completion_check: "rustup +nightly target list --installed | grep -q {{params.cross_target}}"
     depends_on: [cross-compile-deps]
     tags: [builder, cross-compile]
 
