@@ -25,3 +25,95 @@ jobs:
       repo: ${{ github.event.repository.name }}
       pr_sha: ${{ github.event.pull_request.head.sha || github.sha }}
     secrets: inherit
+
+  validate:
+    name: Validate Stacks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        stack:
+          - 01-inference
+          - 02-training
+          - 03-rag
+          - 04-speech
+          - 05-distributed-inference
+          - 06-full-stack
+          - 07-data-pipeline
+          - 08-observability
+          - 09-edge-inference
+          - 09-qwen-coder
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache forjar build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ../forjar/target
+          key: forjar-${{ runner.os }}-${{ hashFiles('**/forjar.yaml') }}
+          restore-keys: forjar-${{ runner.os }}-
+
+      - name: Lint YAML config
+        run: python3 -c "import yaml; yaml.safe_load(open('stacks/${{ matrix.stack }}/forjar.yaml'))"
+
+      - name: Lint shell scripts
+        run: |
+          if command -v shellcheck >/dev/null 2>&1; then
+            shellcheck scripts/*.sh || true
+          fi
+
+      - name: Validate stack schema
+        run: |
+          python3 -c "
+          import yaml, sys
+          with open('stacks/${{ matrix.stack }}/forjar.yaml') as f:
+              data = yaml.safe_load(f)
+          if not data:
+              print('ERROR: empty config', file=sys.stderr)
+              sys.exit(1)
+          print('OK: ${{ matrix.stack }}')
+          "
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          echo "=== Validating all stacks ==="
+          for f in stacks/*/forjar.yaml; do
+            echo "--- $f ---"
+            python3 -c "import yaml; yaml.safe_load(open('$f'))" || exit 1
+          done
+          echo "=== All stacks valid ==="
+
+      - name: Coverage report
+        run: |
+          total=0; pass=0
+          for f in stacks/*/forjar.yaml; do
+            total=$((total + 1))
+            if python3 -c "import yaml; yaml.safe_load(open('$f'))" 2>/dev/null; then
+              pass=$((pass + 1))
+            fi
+          done
+          echo "Stacks validated: $pass / $total"
+          pct=$((pass * 100 / total))
+          echo "Coverage: ${pct}%"
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Security scan with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL,HIGH

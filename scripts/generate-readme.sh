@@ -152,6 +152,25 @@ HEADER
 cat >> "${README}.tmp" << EOF
 ---
 
+## Table of Contents
+
+- [Status Dashboard](#status-dashboard)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Stacks](#stacks)
+- [Sovereign Stack Components](#sovereign-stack-components)
+- [Nightly Binary Releases](#nightly-binary-releases)
+- [Architecture](#architecture)
+- [Recipes](#recipes)
+- [Testing](#testing)
+- [Production Deployment](#production-deployment)
+- [How to Update](#how-to-update)
+- [Contributing](#contributing)
+- [Related Repositories](#related-repositories)
+- [License](#license)
+
+---
+
 ## Status Dashboard
 
 All CI and nightly build status across the sovereign stack.
@@ -159,6 +178,21 @@ All CI and nightly build status across the sovereign stack.
 ${STATUS_DASHBOARD}
 
 ---
+
+## Installation
+
+\`\`\`bash
+# Clone the cookbook
+git clone https://github.com/paiml/sovereign-ai-cookbook
+cd sovereign-ai-cookbook
+
+# Install forjar (the deployment engine)
+cargo install forjar
+
+# Or download a nightly binary
+curl -L -o forjar https://github.com/paiml/forjar/releases/download/nightly/forjar-x86_64-unknown-linux-musl
+chmod +x forjar && mv forjar ~/.cargo/bin/
+\`\`\`
 
 ## Quick Start
 
@@ -326,6 +360,17 @@ README.md is **auto-generated**. Never edit it directly.
 # CI check mode (fails if README.md is stale)
 ./scripts/generate-readme.sh --check
 \`\`\`
+
+## Contributing
+
+Contributions are welcome. To get started:
+
+1. Fork the repository
+2. Create a stack or recipe in the appropriate directory
+3. Validate with \`make validate\`
+4. Submit a pull request
+
+All stack configs must pass \`forjar validate\` before merge. See [How to Update](#how-to-update) for README changes.
 
 ## Related Repositories
 

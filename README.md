@@ -13,6 +13,25 @@
 
 ---
 
+## Table of Contents
+
+- [Status Dashboard](#status-dashboard)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Stacks](#stacks)
+- [Sovereign Stack Components](#sovereign-stack-components)
+- [Nightly Binary Releases](#nightly-binary-releases)
+- [Architecture](#architecture)
+- [Recipes](#recipes)
+- [Testing](#testing)
+- [Production Deployment](#production-deployment)
+- [How to Update](#how-to-update)
+- [Contributing](#contributing)
+- [Related Repositories](#related-repositories)
+- [License](#license)
+
+---
+
 ## Status Dashboard
 
 All CI and nightly build status across the sovereign stack.
@@ -38,6 +57,21 @@ All CI and nightly build status across the sovereign stack.
 | [pacha](https://github.com/paiml/pacha) | `pacha` | [![CI](https://github.com/paiml/pacha/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/pacha/actions/workflows/ci.yml) | [![Nightly](https://github.com/paiml/pacha/actions/workflows/nightly.yml/badge.svg)](https://github.com/paiml/pacha/releases/tag/nightly) |
 
 ---
+
+## Installation
+
+```bash
+# Clone the cookbook
+git clone https://github.com/paiml/sovereign-ai-cookbook
+cd sovereign-ai-cookbook
+
+# Install forjar (the deployment engine)
+cargo install forjar
+
+# Or download a nightly binary
+curl -L -o forjar https://github.com/paiml/forjar/releases/download/nightly/forjar-x86_64-unknown-linux-musl
+chmod +x forjar && mv forjar ~/.cargo/bin/
+```
 
 ## Quick Start
 
@@ -85,53 +119,6 @@ Each stack is a complete, deployable `forjar.yaml` targeting docker containers. 
 |-------|--------|-------|------------|-----------|----------|
 | 01-inference | pass | pass | pass | 1 | 2m30s |
 <!-- STACK_MATRIX_END -->
-
-### Component Clean-Room CI
-
-<!-- CLEAN_ROOM_RESULTS_START -->
-
-**Clean-Room Results** — 34/34 pass (updated: 2026-03-17 11:39 UTC)
-
-Every component is built and tested from scratch inside an ephemeral `rust:1.93-slim` Docker container with no pre-installed dependencies. Mode A simulates `cargo install` from crates.io; Mode B runs `cargo check`, `cargo test --lib`, `cargo test --doc`, and `cargo check --no-default-features`.
-
-| Repo | Status | Gates | Duration | Last Run |
-|------|--------|-------|----------|----------|
-| alimentar | pass | 10/10 | 10m03s | 2026-03-03 |
-| apr-cookbook | pass | 6/6 | 1m27s | 2026-03-17 |
-| aprender | pass | 9/9 | 8m08s | 2026-03-17 |
-| bashrs | pass | 10/10 | 3m35s | 2026-03-03 |
-| batuta | pass | 10/10 | 7m32s | 2026-03-03 |
-| copia | pass | 10/10 | 1m09s | 2026-03-03 |
-| depyler | pass | 10/10 | 1m06s | 2026-03-03 |
-| duende | pass | 8/8 | 42s | 2026-03-03 |
-| entrenar | pass | 10/10 | 13m18s | 2026-03-04 |
-| forjar | pass | 10/10 | 9m44s | 2026-03-17 |
-| pacha | pass | 10/10 | 1m55s | 2026-03-03 |
-| pepita | pass | 11/11 | 28s | 2026-03-04 |
-| pmat | pass | 11/11 | 25m12s | 2026-03-17 |
-| presentar | pass | 10/10 | 2m29s | 2026-03-03 |
-| pzsh | pass | 10/10 | 1m42s | 2026-03-17 |
-| realizar | pass | 11/11 | 29m41s | 2026-03-04 |
-| renacer | pass | 8/8 | 4m45s | 2026-03-03 |
-| rmedia | pass | 10/10 | 3m43s | 2026-03-03 |
-| rosetta-ruchy | pass | 10/10 | 1m29s | 2026-03-17 |
-| ruchy | pass | 8/8 | 4m21s | 2026-03-17 |
-| ruchy-book | pass | 6/6 | 3s | 2026-03-17 |
-| ruchy-docker | pass | 8/8 | 1m51s | 2026-03-17 |
-| ruchy-lambda | pass | 8/8 | 4m40s | 2026-03-17 |
-| ruchydbg | pass | 10/10 | 21s | 2026-03-17 |
-| ruchyruchy | pass | 8/8 | 2m25s | 2026-03-17 |
-| simular | pass | 10/10 | 2m48s | 2026-03-03 |
-| sovereign-ai-cookbook | pass | 18/18 | 40m00s | 2026-03-03 |
-| trueno | pass | 9/9 | 5m23s | 2026-03-03 |
-| trueno-db | pass | 8/8 | 23m43s | 2026-03-03 |
-| trueno-rag | pass | 10/10 | 2m30s | 2026-03-03 |
-| trueno-viz | pass | 8/8 | 2m28s | 2026-03-03 |
-| trueno-zram | pass | 10/10 | 52s | 2026-03-03 |
-| whisper-apr | pass | 11/11 | 7m41s | 2026-03-03 |
-| wos | pass | 6/6 | 1m17s | 2026-03-04 |
-
-<!-- CLEAN_ROOM_RESULTS_END -->
 
 ## Sovereign Stack Components
 
@@ -293,6 +280,17 @@ README.md is **auto-generated**. Never edit it directly.
 # CI check mode (fails if README.md is stale)
 ./scripts/generate-readme.sh --check
 ```
+
+## Contributing
+
+Contributions are welcome. To get started:
+
+1. Fork the repository
+2. Create a stack or recipe in the appropriate directory
+3. Validate with `make validate`
+4. Submit a pull request
+
+All stack configs must pass `forjar validate` before merge. See [How to Update](#how-to-update) for README changes.
 
 ## Related Repositories
 

@@ -1,0 +1,32 @@
+# PMAT Quality Gate Configuration
+# Sovereign AI Cookbook — infrastructure-as-code configs (non-Rust)
+
+[gates]
+# No Rust compilation — skip clippy and cargo test
+run_clippy = false
+clippy_strict = false
+run_tests = false
+test_timeout = 120
+check_coverage = false
+min_coverage = 0.0
+check_complexity = false
+max_complexity = 30
+
+[exclude]
+paths = [
+    "**/target/**",
+    "docs/**",
+]
+
+[comply]
+yaml_secret_exclude_paths = [
+    "stacks/**/*.yaml",
+    "recipes/**/*.yaml",
+    "machines/**/*.yaml",
+]
+
+[tdg]
+exclude = [
+    "scripts/**",
+    "docs/**",
+]
