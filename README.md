@@ -113,18 +113,18 @@ Each stack is a complete, deployable `forjar.yaml` targeting docker containers. 
 
 <!-- STACK_MATRIX_START -->
 
-**Stack Matrix** — 7/9 pass, 2 skip (GPU-only) (updated: 2026-03-20 18:42 UTC)
+**Stack Matrix** — 7/9 pass, 2 skip (GPU-only) (updated: 2026-03-21 05:59 UTC)
 
 | Stack | Status | Apply | Idempotent | Resources | Duration |
 |-------|--------|-------|------------|-----------|----------|
-| 01-inference | pass | pass | pass | 1 | 3m08s |
-| 04-speech | pass | pass | pass | 1 | 8m26s |
-| 08-observability | pass | pass | pass | 1 | 3m49s |
-| 07-data-pipeline | pass | pass | pass | 3 | 9m12s |
-| 03-rag | pass | pass | pass | 3 | 6m36s |
+| 01-inference | pass | pass | pass | 1 | 3m02s |
+| 04-speech | pass | pass | pass | 1 | 8m27s |
+| 08-observability | pass | pass | pass | 1 | 3m37s |
+| 07-data-pipeline | pass | pass | pass | 3 | 8m37s |
+| 03-rag | pass | pass | pass | 3 | 6m40s |
 | 02-training | skip | — | — | 1 | — |
 | 05-distributed-inference | skip | — | — | 3 | — |
-| 06-full-stack | pass | pass | pass | 12 | 12m44s |
+| 06-full-stack | pass | pass | pass | 12 | 12m32s |
 | 09-qwen-coder | pass | pass | pass | 16 | 5m28s |
 <!-- STACK_MATRIX_END -->
 
