@@ -113,11 +113,11 @@ Each stack is a complete, deployable `forjar.yaml` targeting docker containers. 
 
 <!-- STACK_MATRIX_START -->
 
-**Stack Matrix** — 0/1 pass, 1 fail (updated: 2026-04-20 05:21 UTC)
+**Stack Matrix** — 0/1 pass, 1 fail (updated: 2026-04-20 09:21 UTC)
 
 | Stack | Status | Apply | Idempotent | Resources | Duration |
 |-------|--------|-------|------------|-----------|----------|
-| 01-inference | FAIL | FAIL | — | 1 | 22s |
+| 01-inference | FAIL | FAIL | — | 1 | 17s |
 <!-- STACK_MATRIX_END -->
 
 ## Sovereign Stack Components
